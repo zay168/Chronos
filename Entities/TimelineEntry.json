@@ -1,0 +1,46 @@
+{
+  "name": "TimelineEntry",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Title of the timeline entry"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the event"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of the event"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "milestone",
+        "achievement",
+        "event",
+        "project",
+        "personal"
+      ],
+      "default": "event",
+      "description": "Category of the timeline entry"
+    },
+    "importance": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium",
+      "description": "Importance level of the entry"
+    }
+  },
+  "required": [
+    "title",
+    "date"
+  ]
+}
