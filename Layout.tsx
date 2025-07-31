@@ -68,11 +68,10 @@ export default function Layout({ children, currentPageName }) {
                 <SidebarMenu className="space-y-1">
                   {navigationItems.map((item) => (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton 
-                        asChild 
+                      <SidebarMenuButton
                         className={`transition-all duration-300 rounded-xl px-4 py-3 ${
-                          location.pathname === item.url 
-                            ? 'bg-gradient-to-r from-slate-900 to-slate-800 text-white shadow-lg' 
+                          location.pathname === item.url
+                            ? 'bg-gradient-to-r from-slate-900 to-slate-800 text-white shadow-lg'
                             : 'hover:bg-slate-50 text-slate-700 hover:text-slate-900'
                         }`}
                       >

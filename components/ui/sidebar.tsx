@@ -18,8 +18,12 @@ export function SidebarGroupLabel({ children, className = '' }: { children: Reac
 export function SidebarMenu({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return <div className={className}>{children}</div>;
 }
-export function SidebarMenuButton({ children, className = '', ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { asChild?: boolean }) {
-  return <button className={className} {...props}>{children}</button>;
+export function SidebarMenuButton({ children, className = '', ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button className={className} {...props}>
+      {children}
+    </button>
+  );
 }
 export function SidebarMenuItem({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return <div className={className}>{children}</div>;
