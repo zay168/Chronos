@@ -13,25 +13,27 @@ export default function EntryForm({ onSubmit, isLoading }) {
     title: "",
     description: "",
     date: "",
-    category: "event",
-    importance: "medium"
+    precision: "day",
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
-    setFormData({
-      title: "",
-      description: "",
-      date: "",
-      category: "event",
-      importance: "medium"
-    });
+    const { date, precision } = formData;
+    let isoDate = "";
+    if (precision === "year") isoDate = new Date(`${date}-01-01`).toISOString();
+    else if (precision === "month") isoDate = new Date(`${date}-01`).toISOString();
+    else isoDate = new Date(date).toISOString();
+    onSubmit({ ...formData, date: isoDate });
+    setFormData({ title: "", description: "", date: "", precision: "day" });
   };
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
+
+  const dateInputType = formData.precision === "hour" ? "datetime-local" :
+    formData.precision === "day" ? "date" :
+    formData.precision === "month" ? "month" : "number";
 
   return (
     <motion.div
@@ -48,7 +50,7 @@ export default function EntryForm({ onSubmit, isLoading }) {
             Add Timeline Entry
           </CardTitle>
         </CardHeader>
-        
+
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
@@ -65,14 +67,14 @@ export default function EntryForm({ onSubmit, isLoading }) {
                   className="border-slate-200 focus:border-amber-400 focus:ring-amber-400/20"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="date" className="text-sm font-semibold text-slate-700">
                   Date
                 </Label>
                 <Input
                   id="date"
-                  type="date"
+                  type={dateInputType}
                   value={formData.date}
                   onChange={(e) => handleChange("date", e.target.value)}
                   required
@@ -80,7 +82,22 @@ export default function EntryForm({ onSubmit, isLoading }) {
                 />
               </div>
             </div>
-            
+
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold text-slate-700">Precision</Label>
+              <Select value={formData.precision} onValueChange={(value) => handleChange("precision", value)}>
+                <SelectTrigger className="border-slate-200 focus:border-amber-400 focus:ring-amber-400/20">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="year">Year</SelectItem>
+                  <SelectItem value="month">Month</SelectItem>
+                  <SelectItem value="day">Day</SelectItem>
+                  <SelectItem value="hour">Hour</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="description" className="text-sm font-semibold text-slate-700">
                 Description
@@ -94,42 +111,9 @@ export default function EntryForm({ onSubmit, isLoading }) {
                 className="border-slate-200 focus:border-amber-400 focus:ring-amber-400/20 resize-none"
               />
             </div>
-            
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label className="text-sm font-semibold text-slate-700">Category</Label>
-                <Select value={formData.category} onValueChange={(value) => handleChange("category", value)}>
-                  <SelectTrigger className="border-slate-200 focus:border-amber-400 focus:ring-amber-400/20">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="milestone">🏆 Milestone</SelectItem>
-                    <SelectItem value="achievement">⭐ Achievement</SelectItem>
-                    <SelectItem value="event">📅 Event</SelectItem>
-                    <SelectItem value="project">⚡ Project</SelectItem>
-                    <SelectItem value="personal">👤 Personal</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label className="text-sm font-semibold text-slate-700">Importance</Label>
-                <Select value={formData.importance} onValueChange={(value) => handleChange("importance", value)}>
-                  <SelectTrigger className="border-slate-200 focus:border-amber-400 focus:ring-amber-400/20">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">🔹 Low</SelectItem>
-                    <SelectItem value="medium">🔸 Medium</SelectItem>
-                    <SelectItem value="high">🔶 High</SelectItem>
-                    <SelectItem value="critical">🔥 Critical</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            
-            <Button 
-              type="submit" 
+
+            <Button
+              type="submit"
               disabled={isLoading}
               className="w-full bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white shadow-lg hover:shadow-xl transition-all duration-300 py-3"
             >

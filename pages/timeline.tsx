@@ -16,7 +16,7 @@ export default function Timeline() {
   const loadEntries = async () => {
     setIsLoading(true);
     try {
-      const data = await TimelineEntry.list("date", 50);
+      const data = await TimelineEntry.list();
       setEntries(data);
     } catch (error) {
       console.error("Error loading timeline entries:", error);
