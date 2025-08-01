@@ -16,6 +16,13 @@ export class TimelineEntry {
     return res.json();
   }
 
+  static async search(query: string): Promise<TimelineEntryType[]> {
+    const params = new URLSearchParams({ q: query });
+    const res = await fetch(`${API_URL}/search?${params.toString()}`);
+    if (!res.ok) throw new Error('Failed to search entries');
+    return res.json();
+  }
+
   static async create(data: Omit<TimelineEntryType, 'id' | 'createdAt'>): Promise<TimelineEntryType> {
     const res = await fetch(API_URL, {
       method: 'POST',
