@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { TimelineEntry } from "@/entities/TimelineEntry";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import TimelineEntryComponent from "../components/timeline/TimelineEntry";
 import TimelineLine from "../components/timeline/TimelineLine";
@@ -10,26 +11,10 @@ export default function Timeline() {
   const [entries, setEntries] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
 
   useEffect(() => {
     loadEntries();
   }, []);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 300);
-    return () => clearTimeout(timeout);
-  }, [search]);
-
-  useEffect(() => {
-    if (debouncedSearch.trim() === '') {
-      loadEntries();
-    } else {
-      searchEntries(debouncedSearch);
-    }
-  }, [debouncedSearch]);
 
   const loadEntries = async () => {
     setIsLoading(true);
@@ -51,6 +36,14 @@ export default function Timeline() {
       console.error('Error searching timeline entries:', error);
     }
     setIsLoading(false);
+  };
+
+  const handleSearch = () => {
+    if (search.trim() === '') {
+      loadEntries();
+    } else {
+      searchEntries(search.trim());
+    }
   };
 
   const timelineHeight = entries.length > 0 ? entries.length * 180 + 120 : 400;
@@ -96,13 +89,19 @@ export default function Timeline() {
             </div>
           )}
 
-          <div className="max-w-md mx-auto mt-8">
+          <div className="max-w-md mx-auto mt-8 flex gap-2">
             <Input
               placeholder="Search events..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="border-slate-300"
+              className="border-slate-300 flex-1"
             />
+            <Button
+              onClick={handleSearch}
+              className="bg-amber-500 hover:bg-amber-600 text-white border-amber-600"
+            >
+              Search
+            </Button>
           </div>
         </motion.div>
 
