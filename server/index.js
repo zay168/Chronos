@@ -13,8 +13,8 @@ app.get('/api/entries/search', async (req, res) => {
   const entries = await prisma.timelineEntry.findMany({
     where: {
       OR: [
-        { title: { contains: String(query), mode: 'insensitive' } },
-        { description: { contains: String(query), mode: 'insensitive' } }
+        { title: { contains: String(query) } },
+        { description: { contains: String(query) } }
       ]
     },
     orderBy: { date: 'asc' }
