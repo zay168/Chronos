@@ -8,11 +8,20 @@ Simple React application to manage and visualize a timeline.
    ```bash
    npm install
    ```
-2. Start the development server
+2. Initialize the local database
+   ```bash
+   npx prisma db push
+   ```
+   This creates the SQLite file specified in `.env`.
+3. Start the development server
    ```bash
    npm run dev
    ```
    The app will be available at `http://localhost:5173` by default.
+4. Start the API server in another terminal
+   ```bash
+   npm run server
+   ```
 
 ## Build
 
