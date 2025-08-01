@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { TimelineEntry } from "@/entities/TimelineEntry";
+import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import TimelineEntryComponent from "../components/timeline/TimelineEntry";
 import TimelineLine from "../components/timeline/TimelineLine";
@@ -8,10 +9,27 @@ import { Calendar, TrendingUp } from "lucide-react";
 export default function Timeline() {
   const [entries, setEntries] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
   useEffect(() => {
     loadEntries();
   }, []);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [search]);
+
+  useEffect(() => {
+    if (debouncedSearch.trim() === '') {
+      loadEntries();
+    } else {
+      searchEntries(debouncedSearch);
+    }
+  }, [debouncedSearch]);
 
   const loadEntries = async () => {
     setIsLoading(true);
@@ -20,6 +38,17 @@ export default function Timeline() {
       setEntries(data);
     } catch (error) {
       console.error("Error loading timeline entries:", error);
+    }
+    setIsLoading(false);
+  };
+
+  const searchEntries = async (query: string) => {
+    setIsLoading(true);
+    try {
+      const data = await TimelineEntry.search(query);
+      setEntries(data);
+    } catch (error) {
+      console.error('Error searching timeline entries:', error);
     }
     setIsLoading(false);
   };
@@ -57,7 +86,7 @@ export default function Timeline() {
           <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
             Experience your timeline with intelligent positioning and beautiful visualizations
           </p>
-          
+
           {entries.length > 0 && (
             <div className="flex items-center justify-center gap-6 mt-8">
               <div className="flex items-center gap-2 text-slate-600">
@@ -66,6 +95,15 @@ export default function Timeline() {
               </div>
             </div>
           )}
+
+          <div className="max-w-md mx-auto mt-8">
+            <Input
+              placeholder="Search events..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="border-slate-300"
+            />
+          </div>
         </motion.div>
 
         {entries.length === 0 ? (

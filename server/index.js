@@ -8,6 +8,20 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get('/api/entries/search', async (req, res) => {
+  const query = req.query.q || '';
+  const entries = await prisma.timelineEntry.findMany({
+    where: {
+      OR: [
+        { title: { contains: String(query), mode: 'insensitive' } },
+        { description: { contains: String(query), mode: 'insensitive' } }
+      ]
+    },
+    orderBy: { date: 'asc' }
+  });
+  res.json(entries);
+});
+
 app.get('/api/entries', async (req, res) => {
   const entries = await prisma.timelineEntry.findMany({
     orderBy: { date: 'asc' }
