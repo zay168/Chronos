@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { TimelineEntry } from "@/entities/TimelineEntry";
 import { motion } from "framer-motion";
 import EntryForm from "../components/admin/EntryForm";
+import ImportEntries from "../components/admin/ImportEntries";
 import { Settings, Sparkles, Clock, CheckCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -76,8 +77,9 @@ export default function Admin() {
         )}
 
         <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-8">
             <EntryForm onSubmit={handleSubmit} isLoading={isLoading} />
+            <ImportEntries onImported={loadRecentEntries} />
           </div>
           
           <div className="space-y-6">
