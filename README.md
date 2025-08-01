@@ -37,6 +37,26 @@ And preview it with:
 npm run preview
 ```
 
+## JSON Import
+
+You can bulk add timeline entries by uploading a JSON file in the Admin panel.
+The file must follow this structure:
+
+```json
+{
+  "entries": [
+    {
+      "title": "Event title",
+      "description": "Optional description",
+      "date": "YYYY-MM-DD",
+      "precision": "year|month|day|hour"
+    }
+  ]
+}
+```
+
+An example file is provided at `import-example.json`.
+
 ## Environment
 
 This project uses a local SQLite database managed by Prisma. An example

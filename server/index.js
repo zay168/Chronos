@@ -27,6 +27,28 @@ app.post('/api/entries', async (req, res) => {
   res.json(entry);
 });
 
+app.post('/api/entries/bulk', async (req, res) => {
+  const { entries } = req.body;
+  if (!Array.isArray(entries)) {
+    res.status(400).json({ error: 'Entries array missing' });
+    return;
+  }
+  const created = [];
+  for (const e of entries) {
+    if (!e.title || !e.date || !e.precision) continue;
+    const entry = await prisma.timelineEntry.create({
+      data: {
+        title: e.title,
+        description: e.description || '',
+        date: new Date(e.date),
+        precision: e.precision,
+      }
+    });
+    created.push(entry);
+  }
+  res.json(created);
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`API server listening on port ${PORT}`);
