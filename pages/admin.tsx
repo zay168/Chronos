@@ -16,8 +16,9 @@ export default function Admin() {
 
   const loadRecentEntries = async () => {
     try {
-      const data = await TimelineEntry.list("-created_date", 5);
-      setRecentEntries(data);
+      const data = await TimelineEntry.list();
+      const recent = data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5);
+      setRecentEntries(recent);
     } catch (error) {
       console.error("Error loading recent entries:", error);
     }

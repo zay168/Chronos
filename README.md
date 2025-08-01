@@ -27,3 +27,17 @@ And preview it with:
 ```bash
 npm run preview
 ```
+
+## Environment
+
+This project uses a local SQLite database managed by Prisma. An example
+`.env` file is included in the repository. It defines the database location
+and the API server port:
+
+```bash
+DATABASE_URL=file:./dev.db
+PORT=3001
+```
+
+The file can be found at the project root. Feel free to adjust the values
+if you need to change the database path or server port.
