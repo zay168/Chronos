@@ -1,0 +1,16 @@
+{
+  "entries": [
+    {
+      "title": "Started Job",
+      "description": "Began new position at company",
+      "date": "2024-05-01",
+      "precision": "day"
+    },
+    {
+      "title": "Graduated University",
+      "description": "Completed computer science degree",
+      "date": "2023-06-15",
+      "precision": "day"
+    }
+  ]
+}

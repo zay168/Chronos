@@ -25,4 +25,14 @@ export class TimelineEntry {
     if (!res.ok) throw new Error('Failed to create entry');
     return res.json();
   }
+
+  static async bulkCreate(entries: Omit<TimelineEntryType, 'id' | 'createdAt'>[]): Promise<TimelineEntryType[]> {
+    const res = await fetch(`${API_URL}/bulk`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ entries })
+    });
+    if (!res.ok) throw new Error('Failed to import entries');
+    return res.json();
+  }
 }
