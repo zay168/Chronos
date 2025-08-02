@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { TimelineEntry } from "@/entities/TimelineEntry";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -11,9 +11,15 @@ export default function Timeline() {
   const [entries, setEntries] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scrollTop, setScrollTop] = useState(0);
+  const [containerHeight, setContainerHeight] = useState(0);
 
   useEffect(() => {
     loadEntries();
+    if (containerRef.current) {
+      setContainerHeight(containerRef.current.clientHeight);
+    }
   }, []);
 
   const loadEntries = async () => {
@@ -47,6 +53,19 @@ export default function Timeline() {
   };
 
   const timelineHeight = entries.length > 0 ? entries.length * 180 + 120 : 400;
+  const buffer = 5;
+  const startIndex = Math.max(0, Math.floor(scrollTop / 180) - buffer);
+  const endIndex = Math.min(
+    entries.length,
+    Math.ceil((scrollTop + containerHeight) / 180) + buffer
+  );
+  const visibleEntries = entries.slice(startIndex, endIndex);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      setContainerHeight(containerRef.current.clientHeight);
+    }
+  }, [entries]);
 
   if (isLoading) {
     return (
@@ -121,17 +140,24 @@ export default function Timeline() {
             </p>
           </motion.div>
         ) : (
-          <div className="relative" style={{ height: `${timelineHeight}px` }}>
-            <TimelineLine height={timelineHeight} />
-            
-            {entries.map((entry, index) => (
-              <TimelineEntryComponent
-                key={entry.id}
-                entry={entry}
-                position={index}
-                isLeft={index % 2 === 0}
-              />
-            ))}
+          <div
+            ref={containerRef}
+            onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}
+            className="relative overflow-y-auto"
+            style={{ height: '80vh' }}
+          >
+            <div className="relative" style={{ height: `${timelineHeight}px` }}>
+              <TimelineLine height={timelineHeight} />
+
+              {visibleEntries.map((entry, index) => (
+                <TimelineEntryComponent
+                  key={entry.id}
+                  entry={entry}
+                  position={startIndex + index}
+                  isLeft={(startIndex + index) % 2 === 0}
+                />
+              ))}
+            </div>
           </div>
         )}
       </div>
