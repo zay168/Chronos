@@ -33,7 +33,7 @@ export default function Admin() {
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
     } catch (error) {
-      console.error("Error creating timeline entry:", error);
+      console.error("Error creating schedule item:", error);
     }
     setIsLoading(false);
   };
@@ -53,10 +53,10 @@ export default function Admin() {
           </div>
           
           <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-amber-800 bg-clip-text text-transparent mb-4">
-            Timeline Control
+            Schedule Control
           </h1>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Add new entries to your intelligent timeline. Each entry will automatically position itself based on date.
+            Add new items to your daily schedule. Each item will automatically position itself based on date.
           </p>
         </motion.div>
 
@@ -70,7 +70,7 @@ export default function Admin() {
             <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-4">
               <div className="flex items-center gap-3 text-emerald-800">
                 <CheckCircle className="w-6 h-6" />
-                <span className="font-semibold">Timeline entry added successfully!</span>
+                <span className="font-semibold">Schedule item added successfully!</span>
               </div>
             </div>
           </motion.div>
@@ -121,7 +121,7 @@ export default function Admin() {
                   <Sparkles className="w-8 h-8 text-amber-600 mx-auto mb-3" />
                   <h3 className="font-bold text-amber-900 mb-2">Intelligent Positioning</h3>
                   <p className="text-sm text-amber-700 leading-relaxed">
-                    Your timeline automatically sorts and positions entries by date, creating a beautiful chronological flow.
+                    Your schedule automatically sorts and positions entries by date, creating an easy-to-follow plan.
                   </p>
                 </div>
               </CardContent>

@@ -19,8 +19,8 @@ import {
 
 const navigationItems = [
   {
-    title: "Timeline",
-    url: createPageUrl("Timeline"),
+    title: "Schedule",
+    url: createPageUrl("Schedule"),
     icon: History,
   },
   {
@@ -54,7 +54,7 @@ export default function Layout({ children, currentPageName }) {
               </div>
               <div>
                 <h2 className="font-bold text-slate-900 text-lg">Chronos</h2>
-                <p className="text-xs text-slate-500 font-medium">Intelligent Timeline</p>
+                <p className="text-xs text-slate-500 font-medium">Daily Schedule</p>
               </div>
             </div>
           </SidebarHeader>

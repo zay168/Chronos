@@ -1,6 +1,6 @@
 # Chronos
 
-Simple React application to manage and visualize a timeline. 
+Simple React application to plan your week and view a day-by-day schedule.
 
 ## Development
 
@@ -39,7 +39,7 @@ npm run preview
 
 ## JSON Import
 
-You can bulk add timeline entries by uploading a JSON file in the Admin panel.
+You can bulk add schedule items by uploading a JSON file in the Admin panel.
 The file must follow this structure:
 
 ```json

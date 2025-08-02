@@ -7,7 +7,7 @@ import TimelineEntryComponent from "../components/timeline/TimelineEntry";
 import TimelineLine from "../components/timeline/TimelineLine";
 import { Calendar, TrendingUp } from "lucide-react";
 
-export default function Timeline() {
+export default function Schedule() {
   const [entries, setEntries] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -28,7 +28,7 @@ export default function Timeline() {
       const data = await TimelineEntry.list();
       setEntries(data);
     } catch (error) {
-      console.error("Error loading timeline entries:", error);
+      console.error("Error loading schedule entries:", error);
     }
     setIsLoading(false);
   };
@@ -39,7 +39,7 @@ export default function Timeline() {
       const data = await TimelineEntry.search(query);
       setEntries(data);
     } catch (error) {
-      console.error('Error searching timeline entries:', error);
+      console.error('Error searching schedule entries:', error);
     }
     setIsLoading(false);
   };
@@ -52,7 +52,7 @@ export default function Timeline() {
     }
   };
 
-  const timelineHeight = entries.length > 0 ? entries.length * 180 + 120 : 400;
+  const scheduleHeight = entries.length > 0 ? entries.length * 180 + 120 : 400;
   const buffer = 5;
   const startIndex = Math.max(0, Math.floor(scrollTop / 180) - buffer);
   const endIndex = Math.min(
@@ -72,7 +72,7 @@ export default function Timeline() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-slate-300 border-t-amber-500 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600 font-medium">Loading your timeline...</p>
+          <p className="text-slate-600 font-medium">Loading your schedule...</p>
         </div>
       </div>
     );
@@ -89,28 +89,28 @@ export default function Timeline() {
         >
           <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-3 shadow-lg border border-slate-200/60 mb-6">
             <Calendar className="w-6 h-6 text-amber-500" />
-            <span className="text-slate-600 font-medium">Intelligent Timeline</span>
+            <span className="text-slate-600 font-medium">Daily Schedule</span>
           </div>
           
-          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-amber-800 bg-clip-text text-transparent mb-4">
-            Your Journey
-          </h1>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Experience your timeline with intelligent positioning and beautiful visualizations
-          </p>
+            <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-amber-800 bg-clip-text text-transparent mb-4">
+              Your Day Plan
+            </h1>
+            <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+              Plan your week and view each day with an intuitive schedule and clear visualizations
+            </p>
 
           {entries.length > 0 && (
             <div className="flex items-center justify-center gap-6 mt-8">
               <div className="flex items-center gap-2 text-slate-600">
                 <TrendingUp className="w-5 h-5 text-emerald-500" />
-                <span className="font-medium">{entries.length} Timeline Entries</span>
+                  <span className="font-medium">{entries.length} Schedule Entries</span>
               </div>
             </div>
           )}
 
           <div className="max-w-md mx-auto mt-8 flex gap-2">
             <Input
-              placeholder="Search events..."
+              placeholder="Search activities..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="border-slate-300 flex-1"
@@ -134,9 +134,9 @@ export default function Timeline() {
             <div className="w-24 h-24 bg-gradient-to-br from-slate-200 to-slate-300 rounded-full flex items-center justify-center mx-auto mb-8">
               <Calendar className="w-12 h-12 text-slate-500" />
             </div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Your Timeline Awaits</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Your Schedule Awaits</h2>
             <p className="text-slate-600 text-lg max-w-md mx-auto mb-8">
-              Start building your intelligent timeline by adding your first entry in the Admin Panel.
+              Start building your daily schedule by adding your first entry in the Admin Panel.
             </p>
           </motion.div>
         ) : (
@@ -146,8 +146,8 @@ export default function Timeline() {
             className="relative overflow-y-auto"
             style={{ height: '80vh' }}
           >
-            <div className="relative" style={{ height: `${timelineHeight}px` }}>
-              <TimelineLine height={timelineHeight} />
+            <div className="relative" style={{ height: `${scheduleHeight}px` }}>
+              <TimelineLine height={scheduleHeight} />
 
               {visibleEntries.map((entry, index) => (
                 <TimelineEntryComponent
