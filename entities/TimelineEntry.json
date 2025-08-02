@@ -4,7 +4,7 @@
   "properties": {
     "title": {
       "type": "string",
-      "description": "Title of the timeline entry"
+      "description": "Title of the schedule item"
     },
     "description": {
       "type": "string",
@@ -25,7 +25,7 @@
         "personal"
       ],
       "default": "event",
-      "description": "Category of the timeline entry"
+      "description": "Category of the schedule item"
     },
     "importance": {
       "type": "string",

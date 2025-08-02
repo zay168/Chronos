@@ -47,7 +47,7 @@ export default function EntryForm({ onSubmit, isLoading }) {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
-            Add Timeline Entry
+            Add Schedule Item
           </CardTitle>
         </CardHeader>
 
@@ -106,7 +106,7 @@ export default function EntryForm({ onSubmit, isLoading }) {
                 id="description"
                 value={formData.description}
                 onChange={(e) => handleChange("description", e.target.value)}
-                placeholder="Describe this timeline event..."
+                placeholder="Describe this scheduled activity..."
                 rows={3}
                 className="border-slate-200 focus:border-amber-400 focus:ring-amber-400/20 resize-none"
               />
@@ -120,12 +120,12 @@ export default function EntryForm({ onSubmit, isLoading }) {
               {isLoading ? (
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Adding to Timeline...
+                  Adding to Schedule...
                 </div>
               ) : (
                 <>
                   <Plus className="w-5 h-5 mr-2" />
-                  Add to Timeline
+                  Add to Schedule
                 </>
               )}
             </Button>
