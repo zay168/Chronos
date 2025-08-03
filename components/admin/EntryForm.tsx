@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,24 +9,69 @@ import { Plus, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTranslation } from "@/src/i18n";
 
-export default function EntryForm({ onSubmit, isLoading }) {
+export default function EntryForm({ onSubmit, isLoading, initialData, onCancel }) {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     date: "",
     precision: "day",
+    recurrenceRule: "none",
+    reminderAt: "",
   });
   const { t } = useTranslation();
 
+  useEffect(() => {
+    if (initialData) {
+      const d = new Date(initialData.date);
+      let formatted = "";
+      switch (initialData.precision) {
+        case "year":
+          formatted = d.getFullYear().toString();
+          break;
+        case "month":
+          formatted = d.toISOString().slice(0, 7);
+          break;
+        case "day":
+          formatted = d.toISOString().slice(0, 10);
+          break;
+        case "hour":
+          formatted = d.toISOString().slice(0, 13);
+          break;
+        case "minute":
+          formatted = d.toISOString().slice(0, 16);
+          break;
+      }
+      setFormData({
+        title: initialData.title || "",
+        description: initialData.description || "",
+        date: formatted,
+        precision: initialData.precision || "day",
+      });
+    }
+  }, [initialData]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { date, precision } = formData;
+    const { date, precision, reminderAt, recurrenceRule } = formData;
     let isoDate = "";
     if (precision === "year") isoDate = new Date(`${date}-01-01`).toISOString();
     else if (precision === "month") isoDate = new Date(`${date}-01`).toISOString();
     else isoDate = new Date(date).toISOString();
     onSubmit({ ...formData, date: isoDate });
-    setFormData({ title: "", description: "", date: "", precision: "day" });
+    if (initialData) {
+      onCancel?.();
+    } else {
+      setFormData({ title: "", description: "", date: "", precision: "day" });
+    }
+    const isoReminder = reminderAt ? new Date(reminderAt).toISOString() : null;
+    const payload = {
+      ...formData,
+      date: isoDate,
+      reminderAt: isoReminder,
+      recurrenceRule: recurrenceRule === "none" ? null : recurrenceRule,
+    };
+    onSubmit(payload);
+    setFormData({ title: "", description: "", date: "", precision: "day", recurrenceRule: "none", reminderAt: "" });
   };
 
   const handleChange = (field, value) => {
@@ -106,6 +151,32 @@ export default function EntryForm({ onSubmit, isLoading }) {
             </div>
 
             <div className="space-y-2">
+              <Label className="text-sm font-semibold text-slate-700">Recurrence</Label>
+              <Select value={formData.recurrenceRule} onValueChange={(value) => handleChange("recurrenceRule", value)}>
+                <SelectTrigger className="border-slate-200 focus:border-amber-400 focus:ring-amber-400/20">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">None</SelectItem>
+                  <SelectItem value="daily">Daily</SelectItem>
+                  <SelectItem value="weekly">Weekly</SelectItem>
+                  <SelectItem value="monthly">Monthly</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="reminder" className="text-sm font-semibold text-slate-700">Reminder</Label>
+              <Input
+                id="reminder"
+                type="datetime-local"
+                value={formData.reminderAt}
+                onChange={(e) => handleChange("reminderAt", e.target.value)}
+                className="border-slate-200 focus:border-amber-400 focus:ring-amber-400/20"
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="description" className="text-sm font-semibold text-slate-700">
                 {t('entryForm.fields.description')}
               </Label>
@@ -119,23 +190,34 @@ export default function EntryForm({ onSubmit, isLoading }) {
               />
             </div>
 
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white shadow-lg hover:shadow-xl transition-all duration-300 py-3"
-            >
-              {isLoading ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  {t('entryForm.submitting')}
-                </div>
-              ) : (
-                <>
-                  <Plus className="w-5 h-5 mr-2" />
-                  {t('entryForm.submit')}
-                </>
+            <div className="flex gap-2">
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="flex-1 bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white shadow-lg hover:shadow-xl transition-all duration-300 py-3"
+              >
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    {t('entryForm.submitting')}
+                  </div>
+                ) : (
+                  <>
+                    <Plus className="w-5 h-5 mr-2" />
+                    {initialData ? t('entryForm.update') : t('entryForm.submit')}
+                  </>
+                )}
+              </Button>
+              {onCancel && (
+                <Button
+                  type="button"
+                  onClick={onCancel}
+                  className="flex-1 bg-slate-200 text-slate-800 hover:bg-slate-300 shadow-lg hover:shadow-xl transition-all duration-300 py-3"
+                >
+                  {t('timetableManager.cancel')}
+                </Button>
               )}
-            </Button>
+            </div>
           </form>
         </CardContent>
       </Card>
