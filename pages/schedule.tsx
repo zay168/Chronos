@@ -10,7 +10,7 @@ import TimetableManager from "../components/admin/TimetableManager";
 
 export default function Schedule() {
   const [entries, setEntries] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
   const [scrollTop, setScrollTop] = useState(0);
@@ -18,16 +18,22 @@ export default function Schedule() {
   const [timetableId, setTimetableId] = useState<number | null>(null);
 
   useEffect(() => {
-    if (timetableId) loadEntries();
+    if (timetableId) {
+      loadEntries();
+    } else {
+      // No timetable selected: ensure we aren't stuck in loading state
+      setEntries([]);
+      setIsLoading(false);
+    }
     if (containerRef.current) {
       setContainerHeight(containerRef.current.clientHeight);
     }
   }, [timetableId]);
 
   const loadEntries = async () => {
+    if (!timetableId) return;
     setIsLoading(true);
     try {
-      if (!timetableId) return;
       const data = await TimelineEntry.list(timetableId);
       setEntries(data);
     } catch (error) {
@@ -37,9 +43,9 @@ export default function Schedule() {
   };
 
   const searchEntries = async (query: string) => {
+    if (!timetableId) return;
     setIsLoading(true);
     try {
-      if (!timetableId) return;
       const data = await TimelineEntry.search(query, timetableId);
       setEntries(data);
     } catch (error) {
@@ -144,7 +150,7 @@ export default function Schedule() {
             </div>
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Your Schedule Awaits</h2>
             <p className="text-slate-600 text-lg max-w-md mx-auto mb-8">
-              Start building your daily schedule by adding your first entry in the Admin Panel.
+              Use the selector above to create a timetable, then add your first entry in the Admin Panel.
             </p>
           </motion.div>
         ) : (
