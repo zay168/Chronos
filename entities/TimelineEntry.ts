@@ -47,6 +47,16 @@ export class TimelineEntry {
     return res.json();
   }
 
+  static async update(id: number, data: Pick<TimelineEntryType, 'title' | 'description' | 'date' | 'precision'>): Promise<TimelineEntryType> {
+    const res = await fetch(`${API_URL}/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) throw new Error('Failed to update entry');
+    return res.json();
+  }
+
   static async delete(id: number): Promise<void> {
     const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
     if (!res.ok) throw new Error('Failed to delete entry');

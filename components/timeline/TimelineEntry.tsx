@@ -1,12 +1,13 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Calendar, Pencil } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { useSettings } from "@/src/SettingsContext";
 import { useTranslation } from "@/src/i18n";
 
-export default function TimelineEntry({ entry, position, isLeft }) {
+export default function TimelineEntry({ entry, position, isLeft, onEdit }) {
   const { timeFormat } = useSettings();
   const { locale } = useTranslation();
 
@@ -41,7 +42,15 @@ export default function TimelineEntry({ entry, position, isLeft }) {
       style={{ top: `${position * 180 + 60}px` }}
     >
       <Card className="bg-white/90 backdrop-blur-sm border-slate-200/60 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 dark:bg-slate-800/90 dark:border-slate-700/60">
-        <CardContent className="p-6">
+        <CardContent className="p-6 relative">
+          {onEdit && (
+            <Button
+              onClick={() => onEdit(entry)}
+              className="absolute top-2 right-2 p-1 bg-transparent border-none hover:bg-slate-100"
+            >
+              <Pencil className="w-4 h-4" />
+            </Button>
+          )}
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center shadow-lg flex-shrink-0">
               <Calendar className="w-6 h-6 text-white" />

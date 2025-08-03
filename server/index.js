@@ -165,6 +165,20 @@ app.post('/api/entries/:id/generate', async (req, res) => {
   res.json(created);
 });
 
+app.put('/api/entries/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  const { title, description, date, precision } = req.body;
+  if (!title || !date || !precision) {
+    res.status(400).json({ error: 'Missing fields' });
+    return;
+  }
+  const entry = await prisma.timelineEntry.update({
+    where: { id },
+    data: { title, description, date: new Date(date), precision }
+  });
+  res.json(entry);
+});
+
 app.delete('/api/entries/:id', async (req, res) => {
   const id = Number(req.params.id);
   await prisma.timelineEntry.delete({ where: { id } });
