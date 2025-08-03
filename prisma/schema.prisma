@@ -22,8 +22,19 @@ model TimelineEntry {
   description String
   date        DateTime
   precision   String
+
   tags        Json      @default("[]")
+
+  recurrenceRule String?
+  reminderAt   DateTime?
+
   createdAt   DateTime  @default(now())
   timetable   Timetable @relation(fields: [timetableId], references: [id])
   timetableId Int
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  password String
 }

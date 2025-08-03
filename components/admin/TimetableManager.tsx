@@ -13,6 +13,7 @@ interface Props {
 export default function TimetableManager({ value, onChange }: Props) {
   const [timetables, setTimetables] = useState<TimetableType[]>([]);
   const [newName, setNewName] = useState('');
+  const [renameName, setRenameName] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<{ id?: number; countdown: number } | null>(null);
   const { t } = useTranslation();
 
@@ -32,6 +33,12 @@ export default function TimetableManager({ value, onChange }: Props) {
     setNewName('');
     await load();
     onChange(t.id);
+  };
+
+  const handleRename = async () => {
+    if (!value || !renameName.trim()) return;
+    await Timetable.update(value, renameName.trim());
+    await load();
   };
 
   const handleDelete = async (id?: number) => {
@@ -55,6 +62,11 @@ export default function TimetableManager({ value, onChange }: Props) {
     return () => clearTimeout(timer);
   }, [confirmDelete]);
 
+  useEffect(() => {
+    const current = timetables.find((t) => t.id === value);
+    setRenameName(current ? current.name : '');
+  }, [value, timetables]);
+
   const initiateDelete = (id?: number) => {
     setConfirmDelete({ id, countdown: 5 });
   };
@@ -76,6 +88,10 @@ export default function TimetableManager({ value, onChange }: Props) {
       <div className="flex gap-2">
         <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder={t('timetableManager.newPlaceholder')} className="border-slate-200 flex-1" />
         <Button onClick={handleCreate} className="bg-amber-500 text-white border-amber-600">{t('timetableManager.create')}</Button>
+      </div>
+      <div className="flex gap-2">
+        <Input value={renameName} onChange={(e) => setRenameName(e.target.value)} placeholder={t('timetableManager.renamePlaceholder')} className="border-slate-200 flex-1" />
+        <Button onClick={handleRename} disabled={!value} className="bg-blue-500 text-white border-blue-600 disabled:opacity-50">{t('timetableManager.rename')}</Button>
       </div>
       <div className="flex gap-2">
         <Button onClick={() => initiateDelete(value ?? undefined)} disabled={!value} className="flex-1 bg-red-500 text-white border-red-600 disabled:opacity-50">{t('timetableManager.delete')}</Button>

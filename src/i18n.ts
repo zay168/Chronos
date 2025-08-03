@@ -60,6 +60,7 @@ const translations: Translations = {
       },
       submitting: 'Adding to Schedule...',
       submit: 'Add to Schedule',
+      update: 'Update Entry',
     },
     importEntries: {
       title: 'Import JSON',
@@ -70,6 +71,8 @@ const translations: Translations = {
       selectPlaceholder: 'Select timetable',
       newPlaceholder: 'New timetable',
       create: 'Create',
+      renamePlaceholder: 'Rename timetable',
+      rename: 'Rename',
       delete: 'Delete',
       deleteAll: 'Delete All',
       deletingIn: 'Deleting in',
@@ -141,6 +144,7 @@ const translations: Translations = {
       },
       submitting: 'Ajout en cours...',
       submit: 'Ajouter au programme',
+      update: 'Mettre à jour',
     },
     importEntries: {
       title: 'Importer JSON',
@@ -151,6 +155,8 @@ const translations: Translations = {
       selectPlaceholder: "Sélectionner un emploi du temps",
       newPlaceholder: 'Nouvel emploi du temps',
       create: 'Créer',
+      renamePlaceholder: "Renommer l'emploi du temps",
+      rename: 'Renommer',
       delete: 'Supprimer',
       deleteAll: 'Tout supprimer',
       deletingIn: 'Suppression dans',
