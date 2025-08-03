@@ -33,7 +33,7 @@ app.post('/api/login', async (req, res) => {
 });
 
 app.use('/api', (req, res, next) => {
-  if (req.path === '/login') return next();
+  if (req.path === '/login' || req.method === 'GET') return next();
   const authHeader = req.headers.authorization;
   if (!authHeader) {
     res.status(401).json({ error: 'Unauthorized' });
