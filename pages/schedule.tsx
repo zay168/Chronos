@@ -7,6 +7,7 @@ import TimelineEntryComponent from "../components/timeline/TimelineEntry";
 import TimelineLine from "../components/timeline/TimelineLine";
 import { Calendar, TrendingUp } from "lucide-react";
 import TimetableManager from "../components/admin/TimetableManager";
+import EntryForm from "../components/admin/EntryForm";
 import { useTranslation } from "@/src/i18n";
 
 export default function Schedule() {
@@ -17,6 +18,8 @@ export default function Schedule() {
   const [scrollTop, setScrollTop] = useState(0);
   const [containerHeight, setContainerHeight] = useState(0);
   const [timetableId, setTimetableId] = useState<number | null>(null);
+  const [editingEntry, setEditingEntry] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -42,6 +45,19 @@ export default function Schedule() {
       console.error("Error loading schedule entries:", error);
     }
     setIsLoading(false);
+  };
+
+  const handleUpdate = async (formData) => {
+    if (!editingEntry) return;
+    setIsSaving(true);
+    try {
+      await TimelineEntry.update(editingEntry.id, formData);
+      setEditingEntry(null);
+      await loadEntries();
+    } catch (error) {
+      console.error('Error updating entry:', error);
+    }
+    setIsSaving(false);
   };
 
   const searchEntries = async (query: string) => {
@@ -171,12 +187,23 @@ export default function Schedule() {
                   entry={entry}
                   position={startIndex + index}
                   isLeft={(startIndex + index) % 2 === 0}
+                  onEdit={setEditingEntry}
                 />
               ))}
             </div>
           </div>
         )}
       </div>
+      {editingEntry && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <EntryForm
+            onSubmit={handleUpdate}
+            isLoading={isSaving}
+            initialData={editingEntry}
+            onCancel={() => setEditingEntry(null)}
+          />
+        </div>
+      )}
     </div>
   );
 }

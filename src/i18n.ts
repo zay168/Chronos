@@ -57,6 +57,7 @@ const translations: Translations = {
       },
       submitting: 'Adding to Schedule...',
       submit: 'Add to Schedule',
+      update: 'Update Entry',
     },
     importEntries: {
       title: 'Import JSON',
@@ -135,6 +136,7 @@ const translations: Translations = {
       },
       submitting: 'Ajout en cours...',
       submit: 'Ajouter au programme',
+      update: 'Mettre à jour',
     },
     importEntries: {
       title: 'Importer JSON',
