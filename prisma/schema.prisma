@@ -12,8 +12,12 @@ datasource db {
 
 model Timetable {
   id      Int             @id @default(autoincrement())
-  name    String          @unique
+  name    String
   entries TimelineEntry[]
+  user    User            @relation(fields: [userId], references: [id])
+  userId  Int
+
+  @@unique([name, userId])
 }
 
 model TimelineEntry {
@@ -37,4 +41,5 @@ model User {
   id       Int    @id @default(autoincrement())
   username String @unique
   password String
+  timetables Timetable[]
 }

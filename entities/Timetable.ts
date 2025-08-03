@@ -29,9 +29,12 @@ export class Timetable {
   }
 
   static async update(id: number, name: string): Promise<TimetableType> {
+    const token = localStorage.getItem('token');
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
     const res = await fetch(`${API_URL}/${id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ name })
     });
     if (!res.ok) throw new Error('Failed to update timetable');

@@ -50,7 +50,7 @@ app.post('/api/login', async (req, res) => {
 });
 
 app.use('/api', (req, res, next) => {
-  if (req.path === '/login' || req.path === '/signup' || req.method === 'GET') return next();
+  if (req.path === '/login' || req.path === '/signup') return next();
   const authHeader = req.headers.authorization;
   if (!authHeader) {
     res.status(401).json({ error: 'Unauthorized' });
@@ -58,27 +58,30 @@ app.use('/api', (req, res, next) => {
   }
   const token = authHeader.split(' ')[1];
   try {
-    jwt.verify(token, JWT_SECRET);
+    const payload = jwt.verify(token, JWT_SECRET);
+    req.user = payload;
     next();
   } catch (err) {
     res.status(401).json({ error: 'Invalid token' });
   }
 });
-app.get('/api/timetables', async (_req, res) => {
-  const timetables = await prisma.timetable.findMany();
+app.get('/api/timetables', async (req, res) => {
+  const userId = req.user?.userId;
+  const timetables = await prisma.timetable.findMany({ where: { userId } });
   res.json(timetables);
 });
 
 app.post('/api/timetables', async (req, res) => {
   const { name } = req.body;
+  const userId = req.user?.userId;
   if (!name) {
     res.status(400).json({ error: 'Name required' });
     return;
   }
   const timetable = await prisma.timetable.upsert({
-    where: { name },
+    where: { name_userId: { name, userId } },
     update: {},
-    create: { name }
+    create: { name, userId }
   });
   res.json(timetable);
 });
@@ -86,15 +89,21 @@ app.post('/api/timetables', async (req, res) => {
 app.put('/api/timetables/:id', async (req, res) => {
   const id = Number(req.params.id);
   const { name } = req.body;
+  const userId = req.user?.userId;
   if (!name) {
     res.status(400).json({ error: 'Name required' });
     return;
   }
   try {
-    const timetable = await prisma.timetable.update({
-      where: { id },
+    const updated = await prisma.timetable.updateMany({
+      where: { id, userId },
       data: { name }
     });
+    if (updated.count === 0) {
+      res.status(404).json({ error: 'Timetable not found' });
+      return;
+    }
+    const timetable = await prisma.timetable.findUnique({ where: { id } });
     res.json(timetable);
   } catch (error) {
     if (
@@ -110,14 +119,20 @@ app.put('/api/timetables/:id', async (req, res) => {
 
 app.delete('/api/timetables/:id', async (req, res) => {
   const id = Number(req.params.id);
-  await prisma.timelineEntry.deleteMany({ where: { timetableId: id } });
-  await prisma.timetable.delete({ where: { id } });
+  const userId = req.user?.userId;
+  await prisma.timelineEntry.deleteMany({ where: { timetableId: id, timetable: { userId } } });
+  const result = await prisma.timetable.deleteMany({ where: { id, userId } });
+  if (result.count === 0) {
+    res.status(404).json({ error: 'Timetable not found' });
+    return;
+  }
   res.json({ success: true });
 });
 
-app.delete('/api/timetables', async (_req, res) => {
-  await prisma.timelineEntry.deleteMany();
-  await prisma.timetable.deleteMany();
+app.delete('/api/timetables', async (req, res) => {
+  const userId = req.user?.userId;
+  await prisma.timelineEntry.deleteMany({ where: { timetable: { userId } } });
+  await prisma.timetable.deleteMany({ where: { userId } });
   res.json({ success: true });
 });
 
@@ -129,9 +144,11 @@ app.get('/api/entries/search', async (req, res) => {
   const tags = typeof req.query.tags === 'string' && req.query.tags.length > 0
     ? String(req.query.tags).split(',')
     : [];
+  const userId = req.user?.userId;
   const entries = await prisma.timelineEntry.findMany({
     where: {
       timetableId,
+      timetable: { userId },
       ...(tags.length > 0 && { tags: { array_contains: tags } }),
       ...(startDate || endDate
         ? { date: { ...(startDate && { gte: startDate }), ...(endDate && { lte: endDate }) } }
@@ -148,8 +165,9 @@ app.get('/api/entries/search', async (req, res) => {
 
 app.get('/api/entries', async (req, res) => {
   const timetableId = Number(req.query.timetableId);
+  const userId = req.user?.userId;
   const entries = await prisma.timelineEntry.findMany({
-    where: { timetableId },
+    where: { timetableId, timetable: { userId } },
     orderBy: { date: 'asc' }
   });
   res.json(entries);
@@ -169,6 +187,12 @@ app.post('/api/entries', async (req, res) => {
 
   if (!title || !date || !precision || !timetableId) {
     res.status(400).json({ error: 'Missing fields' });
+    return;
+  }
+  const userId = req.user?.userId;
+  const timetable = await prisma.timetable.findFirst({ where: { id: timetableId, userId } });
+  if (!timetable) {
+    res.status(404).json({ error: 'Timetable not found' });
     return;
   }
 
@@ -194,6 +218,12 @@ app.post('/api/entries/bulk', async (req, res) => {
     res.status(400).json({ error: 'Entries array or timetableId missing' });
     return;
   }
+  const userId = req.user?.userId;
+  const timetable = await prisma.timetable.findFirst({ where: { id: timetableId, userId } });
+  if (!timetable) {
+    res.status(404).json({ error: 'Timetable not found' });
+    return;
+  }
   const created = [];
   for (const e of entries) {
     if (!e.title || !e.date || !e.precision) continue;
@@ -217,10 +247,16 @@ app.post('/api/entries/bulk', async (req, res) => {
 app.post('/api/entries/:id/reminder', async (req, res) => {
   const id = Number(req.params.id);
   const { reminderAt } = req.body;
-  const entry = await prisma.timelineEntry.update({
-    where: { id },
+  const userId = req.user?.userId;
+  const updated = await prisma.timelineEntry.updateMany({
+    where: { id, timetable: { userId } },
     data: { reminderAt: reminderAt ? new Date(reminderAt) : null }
   });
+  if (updated.count === 0) {
+    res.status(404).json({ error: 'Entry not found' });
+    return;
+  }
+  const entry = await prisma.timelineEntry.findUnique({ where: { id } });
   res.json(entry);
 });
 
@@ -245,7 +281,8 @@ function getNextDate(date, rule) {
 app.post('/api/entries/:id/generate', async (req, res) => {
   const id = Number(req.params.id);
   const { count = 1 } = req.body;
-  const base = await prisma.timelineEntry.findUnique({ where: { id } });
+  const userId = req.user?.userId;
+  const base = await prisma.timelineEntry.findFirst({ where: { id, timetable: { userId } } });
   if (!base || !base.recurrenceRule) {
     res.status(400).json({ error: 'Entry not found or missing recurrence rule' });
     return;
@@ -273,20 +310,31 @@ app.post('/api/entries/:id/generate', async (req, res) => {
 app.put('/api/entries/:id', async (req, res) => {
   const id = Number(req.params.id);
   const { title, description, date, precision } = req.body;
+  const userId = req.user?.userId;
   if (!title || !date || !precision) {
     res.status(400).json({ error: 'Missing fields' });
     return;
   }
-  const entry = await prisma.timelineEntry.update({
-    where: { id },
+  const updated = await prisma.timelineEntry.updateMany({
+    where: { id, timetable: { userId } },
     data: { title, description, date: new Date(date), precision }
   });
+  if (updated.count === 0) {
+    res.status(404).json({ error: 'Entry not found' });
+    return;
+  }
+  const entry = await prisma.timelineEntry.findUnique({ where: { id } });
   res.json(entry);
 });
 
 app.delete('/api/entries/:id', async (req, res) => {
   const id = Number(req.params.id);
-  await prisma.timelineEntry.delete({ where: { id } });
+  const userId = req.user?.userId;
+  const result = await prisma.timelineEntry.deleteMany({ where: { id, timetable: { userId } } });
+  if (result.count === 0) {
+    res.status(404).json({ error: 'Entry not found' });
+    return;
+  }
   res.json({ success: true });
 });
 
