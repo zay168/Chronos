@@ -24,7 +24,6 @@ export class TimelineEntry {
     return res.json();
   }
 
-
   static async search({
     query = '',
     timetableId,
@@ -43,62 +42,56 @@ export class TimelineEntry {
     if (startDate) params.set('startDate', startDate);
     if (endDate) params.set('endDate', endDate);
     if (tags && tags.length) params.set('tags', tags.join(','));
-    const res = await fetch(`${API_URL}/search?${params.toString()}`);
-
-  static async search(query: string, timetableId: number): Promise<TimelineEntryType[]> {
-    const params = new URLSearchParams({ q: query, timetableId: String(timetableId) });
     const token = localStorage.getItem('token');
     const res = await fetch(`${API_URL}/search?${params.toString()}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     });
-
     if (!res.ok) throw new Error('Failed to search entries');
     return res.json();
   }
 
-
-  static async create(data: Omit<TimelineEntryType, 'id' | 'createdAt'> & { tags?: string[] }): Promise<TimelineEntryType> {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...data, tags: data.tags || [] })
-
-  static async create(data: Omit<TimelineEntryType, 'id' | 'createdAt'>): Promise<TimelineEntryType> {
+  static async create(
+    data: Omit<TimelineEntryType, 'id' | 'createdAt'> & { tags?: string[] },
+  ): Promise<TimelineEntryType> {
     const token = localStorage.getItem('token');
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
     const res = await fetch(API_URL, {
       method: 'POST',
       headers,
-      body: JSON.stringify(data)
-
+      body: JSON.stringify({ ...data, tags: data.tags || [] }),
     });
     if (!res.ok) throw new Error('Failed to create entry');
     return res.json();
   }
 
-
-  static async bulkCreate(entries: (Omit<TimelineEntryType, 'id' | 'createdAt'> & { tags?: string[] })[], timetableId: number): Promise<TimelineEntryType[]> {
-
-  static async bulkCreate(entries: Omit<TimelineEntryType, 'id' | 'createdAt'>[], timetableId: number): Promise<TimelineEntryType[]> {
+  static async bulkCreate(
+    entries: (Omit<TimelineEntryType, 'id' | 'createdAt'> & { tags?: string[] })[],
+    timetableId: number,
+  ): Promise<TimelineEntryType[]> {
     const token = localStorage.getItem('token');
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
-
     const res = await fetch(`${API_URL}/bulk`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ entries, timetableId })
+      body: JSON.stringify({ entries, timetableId }),
     });
     if (!res.ok) throw new Error('Failed to import entries');
     return res.json();
   }
 
-  static async update(id: number, data: Pick<TimelineEntryType, 'title' | 'description' | 'date' | 'precision'>): Promise<TimelineEntryType> {
+  static async update(
+    id: number,
+    data: Pick<TimelineEntryType, 'title' | 'description' | 'date' | 'precision'>,
+  ): Promise<TimelineEntryType> {
+    const token = localStorage.getItem('token');
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
     const res = await fetch(`${API_URL}/${id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
+      headers,
+      body: JSON.stringify(data),
     });
     if (!res.ok) throw new Error('Failed to update entry');
     return res.json();
@@ -114,22 +107,29 @@ export class TimelineEntry {
   }
 
   static async scheduleReminder(id: number, reminderAt: string | null): Promise<TimelineEntryType> {
+    const token = localStorage.getItem('token');
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
     const res = await fetch(`${API_URL}/${id}/reminder`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reminderAt })
+      headers,
+      body: JSON.stringify({ reminderAt }),
     });
     if (!res.ok) throw new Error('Failed to schedule reminder');
     return res.json();
   }
 
   static async generateRecurring(id: number, count: number): Promise<TimelineEntryType[]> {
+    const token = localStorage.getItem('token');
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
     const res = await fetch(`${API_URL}/${id}/generate`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ count })
+      headers,
+      body: JSON.stringify({ count }),
     });
     if (!res.ok) throw new Error('Failed to generate recurrence');
     return res.json();
   }
 }
+

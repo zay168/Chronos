@@ -51,8 +51,6 @@ export default function Schedule() {
   };
 
 
-  const searchEntries = async () => {
-
   const handleUpdate = async (formData) => {
     if (!editingEntry) return;
     setIsSaving(true);
@@ -66,8 +64,7 @@ export default function Schedule() {
     setIsSaving(false);
   };
 
-  const searchEntries = async (query: string) => {
-
+  const searchEntries = async () => {
     if (!timetableId) return;
     setIsLoading(true);
     try {
@@ -138,7 +135,7 @@ export default function Schedule() {
         </div>
       </div>
     );
-  }
+}
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
