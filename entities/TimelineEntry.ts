@@ -3,7 +3,7 @@ export interface TimelineEntryType {
   title: string;
   description: string;
   date: string;
-  precision: 'year' | 'month' | 'day' | 'hour';
+  precision: 'year' | 'month' | 'day' | 'hour' | 'minute';
   createdAt: string;
   timetableId: number;
 }

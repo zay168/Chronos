@@ -17,7 +17,7 @@
     },
     "precision": {
       "type": "string",
-      "enum": ["year", "month", "day", "hour"],
+      "enum": ["year", "month", "day", "hour", "minute"],
       "default": "day",
       "description": "Precision of the scheduled date"
     },
