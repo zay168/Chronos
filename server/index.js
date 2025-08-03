@@ -1,8 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import { PrismaClient, Prisma } from '@prisma/client';
-import { execSync } from 'child_process';
-import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
@@ -141,30 +139,35 @@ app.get('/api/entries', async (req, res) => {
 });
 
 app.post('/api/entries', async (req, res) => {
-
-  const { title, description, date, precision, timetableId, tags } = req.body;
-
-  const { title, description, date, precision, timetableId, recurrenceRule, reminderAt } = req.body;
+  const {
+    title,
+    description,
+    date,
+    precision,
+    timetableId,
+    tags = [],
+    recurrenceRule,
+    reminderAt,
+  } = req.body;
 
   if (!title || !date || !precision || !timetableId) {
     res.status(400).json({ error: 'Missing fields' });
     return;
   }
+
   const entry = await prisma.timelineEntry.create({
-
-    data: { title, description, date: new Date(date), precision, timetableId, tags: tags || [] }
-
     data: {
       title,
       description,
       date: new Date(date),
       precision,
       timetableId,
+      tags,
       recurrenceRule: recurrenceRule || null,
       reminderAt: reminderAt ? new Date(reminderAt) : null,
-    }
-
+    },
   });
+
   res.json(entry);
 });
 
@@ -184,12 +187,10 @@ app.post('/api/entries/bulk', async (req, res) => {
         date: new Date(e.date),
         precision: e.precision,
         timetableId,
-codex/extend-timelineentry-model-with-tags-and-dates
         tags: e.tags || [],
-
         recurrenceRule: e.recurrenceRule || null,
         reminderAt: e.reminderAt ? new Date(e.reminderAt) : null,
-      }
+      },
     });
     created.push(entry);
   }
