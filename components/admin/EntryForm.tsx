@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslation } from "@/src/i18n";
 
 export default function EntryForm({ onSubmit, isLoading }) {
   const [formData, setFormData] = useState({
@@ -15,6 +16,7 @@ export default function EntryForm({ onSubmit, isLoading }) {
     date: "",
     precision: "day",
   });
+  const { t } = useTranslation();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -50,7 +52,7 @@ export default function EntryForm({ onSubmit, isLoading }) {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
-            Add Schedule Item
+            {t('entryForm.title')}
           </CardTitle>
         </CardHeader>
 
@@ -59,13 +61,13 @@ export default function EntryForm({ onSubmit, isLoading }) {
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="title" className="text-sm font-semibold text-slate-700">
-                  Title
+                  {t('entryForm.fields.title')}
                 </Label>
                 <Input
                   id="title"
                   value={formData.title}
                   onChange={(e) => handleChange("title", e.target.value)}
-                  placeholder="Enter event title..."
+                  placeholder={t('entryForm.fields.titlePlaceholder')}
                   required
                   className="border-slate-200 focus:border-amber-400 focus:ring-amber-400/20"
                 />
@@ -73,7 +75,7 @@ export default function EntryForm({ onSubmit, isLoading }) {
 
               <div className="space-y-2">
                 <Label htmlFor="date" className="text-sm font-semibold text-slate-700">
-                  Date
+                  {t('entryForm.fields.date')}
                 </Label>
                 <Input
                   id="date"
@@ -88,30 +90,30 @@ export default function EntryForm({ onSubmit, isLoading }) {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-semibold text-slate-700">Precision</Label>
+              <Label className="text-sm font-semibold text-slate-700">{t('entryForm.fields.precision')}</Label>
               <Select value={formData.precision} onValueChange={(value) => handleChange("precision", value)}>
                 <SelectTrigger className="border-slate-200 focus:border-amber-400 focus:ring-amber-400/20">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="year">Year</SelectItem>
-                  <SelectItem value="month">Month</SelectItem>
-                  <SelectItem value="day">Day</SelectItem>
-                  <SelectItem value="hour">Hour</SelectItem>
-                  <SelectItem value="minute">Minute</SelectItem>
+                  <SelectItem value="year">{t('entryForm.precision.year')}</SelectItem>
+                  <SelectItem value="month">{t('entryForm.precision.month')}</SelectItem>
+                  <SelectItem value="day">{t('entryForm.precision.day')}</SelectItem>
+                  <SelectItem value="hour">{t('entryForm.precision.hour')}</SelectItem>
+                  <SelectItem value="minute">{t('entryForm.precision.minute')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="description" className="text-sm font-semibold text-slate-700">
-                Description
+                {t('entryForm.fields.description')}
               </Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => handleChange("description", e.target.value)}
-                placeholder="Describe this scheduled activity..."
+                placeholder={t('entryForm.fields.descriptionPlaceholder')}
                 rows={3}
                 className="border-slate-200 focus:border-amber-400 focus:ring-amber-400/20 resize-none"
               />
@@ -125,12 +127,12 @@ export default function EntryForm({ onSubmit, isLoading }) {
               {isLoading ? (
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Adding to Schedule...
+                  {t('entryForm.submitting')}
                 </div>
               ) : (
                 <>
                   <Plus className="w-5 h-5 mr-2" />
-                  Add to Schedule
+                  {t('entryForm.submit')}
                 </>
               )}
             </Button>

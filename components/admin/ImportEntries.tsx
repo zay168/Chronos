@@ -5,10 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Upload } from "lucide-react";
 import { TimelineEntry } from "@/entities/TimelineEntry";
 import { Timetable } from "@/entities/Timetable";
+import { useTranslation } from "@/src/i18n";
 
 export default function ImportEntries({ onImported }) {
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useTranslation();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files && e.target.files[0];
@@ -44,7 +46,7 @@ export default function ImportEntries({ onImported }) {
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
             <Upload className="w-5 h-5 text-white" />
           </div>
-          Import JSON
+          {t('importEntries.title')}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -55,7 +57,7 @@ export default function ImportEntries({ onImported }) {
             onClick={handleImport}
             className="w-full bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white shadow-lg hover:shadow-xl transition-all duration-300 py-3"
           >
-            {isLoading ? "Importing..." : "Import"}
+            {isLoading ? t('importEntries.importing') : t('importEntries.import')}
           </Button>
         </div>
       </CardContent>

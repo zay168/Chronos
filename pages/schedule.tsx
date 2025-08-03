@@ -7,6 +7,7 @@ import TimelineEntryComponent from "../components/timeline/TimelineEntry";
 import TimelineLine from "../components/timeline/TimelineLine";
 import { Calendar, TrendingUp } from "lucide-react";
 import TimetableManager from "../components/admin/TimetableManager";
+import { useTranslation } from "@/src/i18n";
 
 export default function Schedule() {
   const [entries, setEntries] = useState([]);
@@ -16,6 +17,7 @@ export default function Schedule() {
   const [scrollTop, setScrollTop] = useState(0);
   const [containerHeight, setContainerHeight] = useState(0);
   const [timetableId, setTimetableId] = useState<number | null>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (timetableId) {
@@ -82,7 +84,7 @@ export default function Schedule() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-slate-300 border-t-amber-500 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600 font-medium dark:text-slate-300">Loading your schedule...</p>
+          <p className="text-slate-600 font-medium dark:text-slate-300">{t('schedule.loading')}</p>
         </div>
       </div>
     );
@@ -99,14 +101,14 @@ export default function Schedule() {
         >
           <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-3 shadow-lg border border-slate-200/60 mb-6 dark:bg-slate-800/80 dark:border-slate-700/60">
             <Calendar className="w-6 h-6 text-amber-500" />
-            <span className="text-slate-600 font-medium dark:text-slate-300">Daily Schedule</span>
+            <span className="text-slate-600 font-medium dark:text-slate-300">{t('schedule.tag')}</span>
           </div>
           
             <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-amber-800 bg-clip-text text-transparent mb-4 dark:from-slate-100 dark:via-slate-100 dark:to-amber-400">
-              Your Day Plan
+              {t('schedule.title')}
             </h1>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed dark:text-slate-300">
-              Plan your week and view each day with an intuitive schedule and clear visualizations
+              {t('schedule.description')}
             </p>
 
           <div className="max-w-md mx-auto mt-8">
@@ -117,14 +119,14 @@ export default function Schedule() {
             <div className="flex items-center justify-center gap-6 mt-8">
             <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
                 <TrendingUp className="w-5 h-5 text-emerald-500" />
-                  <span className="font-medium">{entries.length} Schedule Entries</span>
+                  <span className="font-medium">{entries.length} {t('schedule.entriesCountLabel')}</span>
               </div>
             </div>
           )}
 
           <div className="max-w-md mx-auto mt-8 flex gap-2">
             <Input
-              placeholder="Search activities..."
+              placeholder={t('schedule.searchPlaceholder')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="border-slate-300 flex-1 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
@@ -133,7 +135,7 @@ export default function Schedule() {
               onClick={handleSearch}
               className="bg-amber-500 hover:bg-amber-600 text-white border-amber-600"
             >
-              Search
+              {t('schedule.searchButton')}
             </Button>
           </div>
         </motion.div>
@@ -148,9 +150,9 @@ export default function Schedule() {
             <div className="w-24 h-24 bg-gradient-to-br from-slate-200 to-slate-300 rounded-full flex items-center justify-center mx-auto mb-8 dark:from-slate-700 dark:to-slate-600">
               <Calendar className="w-12 h-12 text-slate-500 dark:text-slate-300" />
             </div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-4 dark:text-slate-100">Your Schedule Awaits</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4 dark:text-slate-100">{t('schedule.emptyTitle')}</h2>
             <p className="text-slate-600 text-lg max-w-md mx-auto mb-8 dark:text-slate-300">
-              Use the selector above to create a timetable, then add your first entry in the Admin Panel.
+              {t('schedule.emptyDescription')}
             </p>
           </motion.div>
         ) : (
