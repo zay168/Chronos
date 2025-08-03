@@ -10,11 +10,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Timetable {
+  id      Int             @id @default(autoincrement())
+  name    String
+  entries TimelineEntry[]
+}
+
 model TimelineEntry {
-  id         Int      @id @default(autoincrement())
-  title      String
+  id          Int       @id @default(autoincrement())
+  title       String
   description String
-  date       DateTime
-  precision  String
-  createdAt  DateTime @default(now())
+  date        DateTime
+  precision   String
+  createdAt   DateTime  @default(now())
+  timetable   Timetable @relation(fields: [timetableId], references: [id])
+  timetableId Int
 }

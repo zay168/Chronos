@@ -12,35 +12,24 @@
     },
     "date": {
       "type": "string",
-      "format": "date",
+      "format": "date-time",
       "description": "Date of the event"
     },
-    "category": {
+    "precision": {
       "type": "string",
-      "enum": [
-        "milestone",
-        "achievement",
-        "event",
-        "project",
-        "personal"
-      ],
-      "default": "event",
-      "description": "Category of the schedule item"
+      "enum": ["year", "month", "day", "hour"],
+      "default": "day",
+      "description": "Precision of the scheduled date"
     },
-    "importance": {
-      "type": "string",
-      "enum": [
-        "low",
-        "medium",
-        "high",
-        "critical"
-      ],
-      "default": "medium",
-      "description": "Importance level of the entry"
+    "timetableId": {
+      "type": "number",
+      "description": "Identifier of the timetable this entry belongs to"
     }
   },
   "required": [
     "title",
-    "date"
+    "date",
+    "precision",
+    "timetableId"
   ]
 }

@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import TimelineEntryComponent from "../components/timeline/TimelineEntry";
 import TimelineLine from "../components/timeline/TimelineLine";
 import { Calendar, TrendingUp } from "lucide-react";
+import TimetableManager from "../components/admin/TimetableManager";
 
 export default function Schedule() {
   const [entries, setEntries] = useState([]);
@@ -14,18 +15,20 @@ export default function Schedule() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scrollTop, setScrollTop] = useState(0);
   const [containerHeight, setContainerHeight] = useState(0);
+  const [timetableId, setTimetableId] = useState<number | null>(null);
 
   useEffect(() => {
-    loadEntries();
+    if (timetableId) loadEntries();
     if (containerRef.current) {
       setContainerHeight(containerRef.current.clientHeight);
     }
-  }, []);
+  }, [timetableId]);
 
   const loadEntries = async () => {
     setIsLoading(true);
     try {
-      const data = await TimelineEntry.list();
+      if (!timetableId) return;
+      const data = await TimelineEntry.list(timetableId);
       setEntries(data);
     } catch (error) {
       console.error("Error loading schedule entries:", error);
@@ -36,7 +39,8 @@ export default function Schedule() {
   const searchEntries = async (query: string) => {
     setIsLoading(true);
     try {
-      const data = await TimelineEntry.search(query);
+      if (!timetableId) return;
+      const data = await TimelineEntry.search(query, timetableId);
       setEntries(data);
     } catch (error) {
       console.error('Error searching schedule entries:', error);
@@ -81,7 +85,7 @@ export default function Schedule() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50">
       <div className="max-w-7xl mx-auto px-6 py-12">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -98,6 +102,10 @@ export default function Schedule() {
             <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
               Plan your week and view each day with an intuitive schedule and clear visualizations
             </p>
+
+          <div className="max-w-md mx-auto mt-8">
+            <TimetableManager value={timetableId} onChange={setTimetableId} />
+          </div>
 
           {entries.length > 0 && (
             <div className="flex items-center justify-center gap-6 mt-8">
