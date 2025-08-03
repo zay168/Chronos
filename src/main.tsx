@@ -7,6 +7,7 @@ import Schedule from '../pages/schedule';
 import Settings from '../pages/settings';
 import { SettingsProvider } from './SettingsContext';
 import Login from '../pages/login';
+import Signup from '../pages/signup';
 import { AuthProvider, useAuth } from './AuthContext';
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
@@ -22,10 +23,11 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
             <Route path="/admin" element={<ProtectedRoute><Layout currentPageName="Admin"><Admin /></Layout></ProtectedRoute>} />
-            <Route path="/schedule" element={<Layout currentPageName="Schedule"><Schedule /></Layout>} />
+            <Route path="/schedule" element={<ProtectedRoute><Layout currentPageName="Schedule"><Schedule /></Layout></ProtectedRoute>} />
             <Route path="/settings" element={<Layout currentPageName="Settings"><Settings /></Layout>} />
-            <Route path="/" element={<Layout currentPageName="Schedule"><Schedule /></Layout>} />
+            <Route path="/" element={<ProtectedRoute><Layout currentPageName="Schedule"><Schedule /></Layout></ProtectedRoute>} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>
