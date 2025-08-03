@@ -3,6 +3,8 @@ import { TimelineEntry } from "@/entities/TimelineEntry";
 import { motion } from "framer-motion";
 import EntryForm from "../components/admin/EntryForm";
 import ImportEntries from "../components/admin/ImportEntries";
+import TimetableManager from "../components/admin/TimetableManager";
+import CalendarEditor from "../components/admin/CalendarEditor";
 import { Settings, Sparkles, Clock, CheckCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -10,14 +12,16 @@ export default function Admin() {
   const [isLoading, setIsLoading] = useState(false);
   const [recentEntries, setRecentEntries] = useState([]);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [timetableId, setTimetableId] = useState<number | null>(null);
 
   useEffect(() => {
-    loadRecentEntries();
-  }, []);
+    if (timetableId) loadRecentEntries();
+  }, [timetableId]);
 
   const loadRecentEntries = async () => {
     try {
-      const data = await TimelineEntry.list();
+      if (!timetableId) return;
+      const data = await TimelineEntry.list(timetableId);
       const recent = data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5);
       setRecentEntries(recent);
     } catch (error) {
@@ -28,7 +32,8 @@ export default function Admin() {
   const handleSubmit = async (formData) => {
     setIsLoading(true);
     try {
-      await TimelineEntry.create(formData);
+      if (!timetableId) throw new Error('No timetable selected');
+      await TimelineEntry.create({ ...formData, timetableId });
       await loadRecentEntries();
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
@@ -78,8 +83,10 @@ export default function Admin() {
 
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
+            <TimetableManager value={timetableId} onChange={setTimetableId} />
             <EntryForm onSubmit={handleSubmit} isLoading={isLoading} />
             <ImportEntries onImported={loadRecentEntries} />
+            <CalendarEditor timetableId={timetableId} />
           </div>
           
           <div className="space-y-6">

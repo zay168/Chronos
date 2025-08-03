@@ -1,0 +1,30 @@
+export interface TimetableType {
+  id: number;
+  name: string;
+}
+
+const API_URL = 'http://localhost:3001/api/timetables';
+
+export class Timetable {
+  static async list(): Promise<TimetableType[]> {
+    const res = await fetch(API_URL);
+    if (!res.ok) throw new Error('Failed to load timetables');
+    return res.json();
+  }
+
+  static async create(name: string): Promise<TimetableType> {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name })
+    });
+    if (!res.ok) throw new Error('Failed to create timetable');
+    return res.json();
+  }
+
+  static async delete(id?: number): Promise<void> {
+    const url = id ? `${API_URL}/${id}` : API_URL;
+    const res = await fetch(url, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Failed to delete timetable');
+  }
+}

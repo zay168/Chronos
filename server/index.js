@@ -8,10 +8,40 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get('/api/timetables', async (_req, res) => {
+  const timetables = await prisma.timetable.findMany();
+  res.json(timetables);
+});
+
+app.post('/api/timetables', async (req, res) => {
+  const { name } = req.body;
+  if (!name) {
+    res.status(400).json({ error: 'Name required' });
+    return;
+  }
+  const timetable = await prisma.timetable.create({ data: { name } });
+  res.json(timetable);
+});
+
+app.delete('/api/timetables/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  await prisma.timelineEntry.deleteMany({ where: { timetableId: id } });
+  await prisma.timetable.delete({ where: { id } });
+  res.json({ success: true });
+});
+
+app.delete('/api/timetables', async (_req, res) => {
+  await prisma.timelineEntry.deleteMany();
+  await prisma.timetable.deleteMany();
+  res.json({ success: true });
+});
+
 app.get('/api/entries/search', async (req, res) => {
   const query = req.query.q || '';
+  const timetableId = Number(req.query.timetableId);
   const entries = await prisma.timelineEntry.findMany({
     where: {
+      timetableId,
       OR: [
         { title: { contains: String(query) } },
         { description: { contains: String(query) } }
@@ -23,28 +53,30 @@ app.get('/api/entries/search', async (req, res) => {
 });
 
 app.get('/api/entries', async (req, res) => {
+  const timetableId = Number(req.query.timetableId);
   const entries = await prisma.timelineEntry.findMany({
+    where: { timetableId },
     orderBy: { date: 'asc' }
   });
   res.json(entries);
 });
 
 app.post('/api/entries', async (req, res) => {
-  const { title, description, date, precision } = req.body;
-  if (!title || !date || !precision) {
+  const { title, description, date, precision, timetableId } = req.body;
+  if (!title || !date || !precision || !timetableId) {
     res.status(400).json({ error: 'Missing fields' });
     return;
   }
   const entry = await prisma.timelineEntry.create({
-    data: { title, description, date: new Date(date), precision }
+    data: { title, description, date: new Date(date), precision, timetableId }
   });
   res.json(entry);
 });
 
 app.post('/api/entries/bulk', async (req, res) => {
-  const { entries } = req.body;
-  if (!Array.isArray(entries)) {
-    res.status(400).json({ error: 'Entries array missing' });
+  const { entries, timetableId } = req.body;
+  if (!Array.isArray(entries) || !timetableId) {
+    res.status(400).json({ error: 'Entries array or timetableId missing' });
     return;
   }
   const created = [];
@@ -56,11 +88,18 @@ app.post('/api/entries/bulk', async (req, res) => {
         description: e.description || '',
         date: new Date(e.date),
         precision: e.precision,
+        timetableId,
       }
     });
     created.push(entry);
   }
   res.json(created);
+});
+
+app.delete('/api/entries/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  await prisma.timelineEntry.delete({ where: { id } });
+  res.json({ success: true });
 });
 
 const PORT = process.env.PORT || 3001;

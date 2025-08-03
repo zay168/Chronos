@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Upload } from "lucide-react";
 import { TimelineEntry } from "@/entities/TimelineEntry";
+import { Timetable } from "@/entities/Timetable";
 
 export default function ImportEntries({ onImported }) {
   const [file, setFile] = useState<File | null>(null);
@@ -21,7 +22,13 @@ export default function ImportEntries({ onImported }) {
       const text = await file.text();
       const json = JSON.parse(text);
       if (!Array.isArray(json.entries)) throw new Error("Invalid format");
-      await TimelineEntry.bulkCreate(json.entries);
+      let timetableId = json.timetableId;
+      if (!timetableId && json.timetable?.name) {
+        const t = await Timetable.create(json.timetable.name);
+        timetableId = t.id;
+      }
+      if (!timetableId) throw new Error('No timetable specified');
+      await TimelineEntry.bulkCreate(json.entries, timetableId);
       if (onImported) onImported();
       setFile(null);
     } catch (err) {
