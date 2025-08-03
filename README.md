@@ -50,7 +50,7 @@ The file must specify a timetable and follow this structure:
       "title": "Event title",
       "description": "Optional description",
       "date": "YYYY-MM-DD",
-      "precision": "year|month|day|hour"
+      "precision": "year|month|day|hour|minute"
     }
   ]
 }

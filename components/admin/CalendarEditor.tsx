@@ -29,7 +29,7 @@ export default function CalendarEditor({ timetableId }: Props) {
     if (!timetableId) return;
     const title = window.prompt('Event title');
     if (!title) return;
-    await TimelineEntry.create({ title, description: '', date: start.toISOString(), precision: 'hour', timetableId });
+    await TimelineEntry.create({ title, description: '', date: start.toISOString(), precision: 'minute', timetableId });
     await load();
   };
 
@@ -47,6 +47,8 @@ export default function CalendarEditor({ timetableId }: Props) {
         events={events}
         defaultView="week"
         selectable
+        step={15}
+        timeslots={4}
         style={{ height: 500 }}
         onSelectSlot={handleSelectSlot}
         onSelectEvent={handleSelectEvent}

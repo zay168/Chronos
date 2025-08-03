@@ -31,9 +31,12 @@ export default function EntryForm({ onSubmit, isLoading }) {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const dateInputType = formData.precision === "hour" ? "datetime-local" :
+  const dateInputType = formData.precision === "hour" || formData.precision === "minute" ? "datetime-local" :
     formData.precision === "day" ? "date" :
     formData.precision === "month" ? "month" : "number";
+
+  const step = formData.precision === "hour" ? 3600 :
+    formData.precision === "minute" ? 60 : undefined;
 
   return (
     <motion.div
@@ -75,6 +78,7 @@ export default function EntryForm({ onSubmit, isLoading }) {
                 <Input
                   id="date"
                   type={dateInputType}
+                  step={step}
                   value={formData.date}
                   onChange={(e) => handleChange("date", e.target.value)}
                   required
@@ -94,6 +98,7 @@ export default function EntryForm({ onSubmit, isLoading }) {
                   <SelectItem value="month">Month</SelectItem>
                   <SelectItem value="day">Day</SelectItem>
                   <SelectItem value="hour">Hour</SelectItem>
+                  <SelectItem value="minute">Minute</SelectItem>
                 </SelectContent>
               </Select>
             </div>

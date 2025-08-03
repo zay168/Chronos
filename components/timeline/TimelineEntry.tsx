@@ -14,6 +14,8 @@ function formatEntryDate(dateStr: string, precision: string) {
     case 'day':
       return format(date, 'MMMM d, yyyy');
     case 'hour':
+      return format(date, 'MMMM d, yyyy HH:00');
+    case 'minute':
       return format(date, 'MMMM d, yyyy HH:mm');
     default:
       return format(date, 'MMMM d, yyyy');
