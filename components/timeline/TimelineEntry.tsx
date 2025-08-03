@@ -4,25 +4,27 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Calendar } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { useSettings } from "@/src/SettingsContext";
+import { useTranslation } from "@/src/i18n";
 
 export default function TimelineEntry({ entry, position, isLeft }) {
   const { timeFormat } = useSettings();
+  const { locale } = useTranslation();
 
   const formatEntryDate = (dateStr: string, precision: string) => {
     const date = parseISO(dateStr);
     switch (precision) {
       case 'year':
-        return format(date, 'yyyy');
+        return format(date, 'yyyy', { locale });
       case 'month':
-        return format(date, 'MMMM yyyy');
+        return format(date, 'MMMM yyyy', { locale });
       case 'day':
-        return format(date, 'MMMM d, yyyy');
+        return format(date, 'MMMM d, yyyy', { locale });
       case 'hour':
-        return format(date, timeFormat === '12h' ? 'MMMM d, yyyy hh:00 a' : 'MMMM d, yyyy HH:00');
+        return format(date, timeFormat === '12h' ? 'MMMM d, yyyy hh:00 a' : 'MMMM d, yyyy HH:00', { locale });
       case 'minute':
-        return format(date, timeFormat === '12h' ? 'MMMM d, yyyy hh:mm a' : 'MMMM d, yyyy HH:mm');
+        return format(date, timeFormat === '12h' ? 'MMMM d, yyyy hh:mm a' : 'MMMM d, yyyy HH:mm', { locale });
       default:
-        return format(date, 'MMMM d, yyyy');
+        return format(date, 'MMMM d, yyyy', { locale });
     }
   };
   return (

@@ -16,27 +16,16 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-
-const navigationItems = [
-  {
-    title: "Schedule",
-    url: createPageUrl("Schedule"),
-    icon: History,
-  },
-  {
-    title: "Admin Panel",
-    url: createPageUrl("Admin"),
-    icon: Settings,
-  },
-  {
-    title: "Settings",
-    url: createPageUrl("Settings"),
-    icon: Cog,
-  },
-];
+import { useTranslation } from "@/src/i18n";
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
+  const { t } = useTranslation();
+  const navigationItems = [
+    { title: t('nav.schedule'), url: createPageUrl('Schedule'), icon: History },
+    { title: t('nav.admin'), url: createPageUrl('Admin'), icon: Settings },
+    { title: t('nav.settings'), url: createPageUrl('Settings'), icon: Cog },
+  ];
 
   return (
     <SidebarProvider>
@@ -59,7 +48,7 @@ export default function Layout({ children, currentPageName }) {
               </div>
               <div>
                 <h2 className="font-bold text-slate-900 text-lg dark:text-slate-100">Chronos</h2>
-                <p className="text-xs text-slate-500 font-medium dark:text-slate-400">Daily Schedule</p>
+                <p className="text-xs text-slate-500 font-medium dark:text-slate-400">{t('schedule.tag')}</p>
               </div>
             </div>
           </SidebarHeader>
@@ -67,7 +56,7 @@ export default function Layout({ children, currentPageName }) {
           <SidebarContent className="p-3">
             <SidebarGroup>
               <SidebarGroupLabel className="text-xs font-semibold text-slate-600 uppercase tracking-wider px-3 py-3 dark:text-slate-300">
-                Navigation
+                {t('nav.navigation')}
               </SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu className="space-y-1">

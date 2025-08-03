@@ -7,12 +7,14 @@ import TimetableManager from "../components/admin/TimetableManager";
 import CalendarEditor from "../components/admin/CalendarEditor";
 import { Settings, Sparkles, Clock, CheckCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useTranslation } from "@/src/i18n";
 
 export default function Admin() {
   const [isLoading, setIsLoading] = useState(false);
   const [recentEntries, setRecentEntries] = useState([]);
   const [showSuccess, setShowSuccess] = useState(false);
   const [timetableId, setTimetableId] = useState<number | null>(null);
+  const { t, language } = useTranslation();
 
   useEffect(() => {
     if (timetableId) loadRecentEntries();
@@ -54,14 +56,14 @@ export default function Admin() {
         >
           <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-3 shadow-lg border border-slate-200/60 mb-6 dark:bg-slate-800/80 dark:border-slate-700/60">
             <Settings className="w-6 h-6 text-slate-700 dark:text-slate-300" />
-            <span className="text-slate-600 font-medium dark:text-slate-300">Admin Panel</span>
+            <span className="text-slate-600 font-medium dark:text-slate-300">{t('admin.tag')}</span>
           </div>
           
           <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-amber-800 bg-clip-text text-transparent mb-4 dark:from-slate-100 dark:via-slate-100 dark:to-amber-400">
-            Schedule Control
+            {t('admin.title')}
           </h1>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed dark:text-slate-300">
-            Add new items to your daily schedule. Each item will automatically position itself based on date.
+            {t('admin.description')}
           </p>
         </motion.div>
 
@@ -75,7 +77,7 @@ export default function Admin() {
             <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-4">
               <div className="flex items-center gap-3 text-emerald-800">
                 <CheckCircle className="w-6 h-6" />
-                <span className="font-semibold">Schedule item added successfully!</span>
+                <span className="font-semibold">{t('admin.success')}</span>
               </div>
             </div>
           </motion.div>
@@ -94,12 +96,12 @@ export default function Admin() {
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-3 text-lg font-bold text-slate-900 dark:text-slate-100">
                   <Clock className="w-5 h-5 text-amber-500" />
-                  Recent Entries
+                  {t('admin.recentEntries')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {recentEntries.length === 0 ? (
-                  <p className="text-slate-500 text-center py-8 dark:text-slate-300">No entries yet</p>
+                  <p className="text-slate-500 text-center py-8 dark:text-slate-300">{t('admin.noEntries')}</p>
                 ) : (
                   <div className="space-y-3">
                     {recentEntries.map((entry) => (
@@ -113,7 +115,7 @@ export default function Admin() {
                           {entry.title}
                         </h4>
                         <p className="text-xs text-slate-500 dark:text-slate-300">
-                          {new Date(entry.date).toLocaleDateString()}
+                          {new Date(entry.date).toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US')}
                         </p>
                       </motion.div>
                     ))}
@@ -126,9 +128,9 @@ export default function Admin() {
               <CardContent className="p-6">
                 <div className="text-center">
                   <Sparkles className="w-8 h-8 text-amber-600 mx-auto mb-3" />
-                  <h3 className="font-bold text-amber-900 mb-2 dark:text-amber-200">Intelligent Positioning</h3>
+                  <h3 className="font-bold text-amber-900 mb-2 dark:text-amber-200">{t('admin.featureTitle')}</h3>
                   <p className="text-sm text-amber-700 leading-relaxed dark:text-amber-300">
-                    Your schedule automatically sorts and positions entries by date, creating an easy-to-follow plan.
+                    {t('admin.featureDesc')}
                   </p>
                 </div>
               </CardContent>

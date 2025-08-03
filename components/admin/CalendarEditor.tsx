@@ -2,11 +2,13 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import enUS from 'date-fns/locale/en-US';
+import fr from 'date-fns/locale/fr';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { TimelineEntry } from '@/entities/TimelineEntry';
 import { useSettings } from '@/src/SettingsContext';
+import { useTranslation } from '@/src/i18n';
 
-const locales = { 'en-US': enUS };
+const locales = { 'en-US': enUS, fr };
 const localizer = dateFnsLocalizer({ format, parse, startOfWeek, getDay, locales });
 
 interface Props {
@@ -16,6 +18,7 @@ interface Props {
 export default function CalendarEditor({ timetableId }: Props) {
   const [events, setEvents] = useState<any[]>([]);
   const { timeFormat } = useSettings();
+  const { t, language } = useTranslation();
 
   const formats = useMemo(() => {
     const fmt = timeFormat === '12h' ? 'hh:mm a' : 'HH:mm';
@@ -43,14 +46,14 @@ export default function CalendarEditor({ timetableId }: Props) {
 
   const handleSelectSlot = async ({ start }: { start: Date }) => {
     if (!timetableId) return;
-    const title = window.prompt('Event title');
+    const title = window.prompt(t('calendarEditor.eventPrompt'));
     if (!title) return;
     await TimelineEntry.create({ title, description: '', date: start.toISOString(), precision: 'minute', timetableId });
     await load();
   };
 
   const handleSelectEvent = async (event: any) => {
-    if (window.confirm('Delete this event?')) {
+    if (window.confirm(t('calendarEditor.deleteConfirm'))) {
       await TimelineEntry.delete(event.id);
       await load();
     }
@@ -69,6 +72,7 @@ export default function CalendarEditor({ timetableId }: Props) {
         onSelectSlot={handleSelectSlot}
         onSelectEvent={handleSelectEvent}
         formats={formats}
+        culture={language === 'fr' ? 'fr' : 'en-US'}
       />
     </div>
   );
