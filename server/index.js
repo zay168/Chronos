@@ -19,7 +19,11 @@ app.post('/api/timetables', async (req, res) => {
     res.status(400).json({ error: 'Name required' });
     return;
   }
-  const timetable = await prisma.timetable.create({ data: { name } });
+  const timetable = await prisma.timetable.upsert({
+    where: { name },
+    update: {},
+    create: { name }
+  });
   res.json(timetable);
 });
 

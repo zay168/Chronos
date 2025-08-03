@@ -40,12 +40,11 @@ npm run preview
 ## JSON Import
 
 You can bulk add schedule items by uploading a JSON file in the Admin panel.
-The file must specify a timetable and follow this structure:
+The file must specify a timetable name and follow this structure:
 
 ```json
 {
-  "timetable": { "name": "My Schedule" },
-  "timetableId": null,
+  "timetable": "My Schedule",
   "entries": [
     {
       "title": "Event title",
@@ -57,8 +56,8 @@ The file must specify a timetable and follow this structure:
 }
 ```
 
-If `timetableId` is provided, entries will be imported into that existing timetable.
-Otherwise a new timetable will be created from the `timetable` name.
+Timetable names are unique. If a timetable with the provided name exists, entries
+will be added to it; otherwise a new timetable will be created.
 
 An example file is provided at `import-example.json`.
 

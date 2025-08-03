@@ -1,6 +1,5 @@
 {
-  "timetable": { "name": "Sample Schedule" },
-  "timetableId": null,
+  "timetable": "Sample Schedule",
   "entries": [
     {
       "title": "Started Job",

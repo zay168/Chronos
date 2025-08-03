@@ -24,13 +24,10 @@ export default function ImportEntries({ onImported }) {
       const text = await file.text();
       const json = JSON.parse(text);
       if (!Array.isArray(json.entries)) throw new Error("Invalid format");
-      let timetableId = json.timetableId;
-      if (!timetableId && json.timetable?.name) {
-        const t = await Timetable.create(json.timetable.name);
-        timetableId = t.id;
-      }
-      if (!timetableId) throw new Error('No timetable specified');
-      await TimelineEntry.bulkCreate(json.entries, timetableId);
+      const timetableName = typeof json.timetable === 'string' ? json.timetable : json.timetable?.name;
+      if (!timetableName) throw new Error('No timetable specified');
+      const t = await Timetable.create(timetableName);
+      await TimelineEntry.bulkCreate(json.entries, t.id);
       if (onImported) onImported();
       setFile(null);
     } catch (err) {
