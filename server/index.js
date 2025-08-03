@@ -12,6 +12,23 @@ app.use(express.json());
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
 
+app.post('/api/signup', async (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    res.status(400).json({ error: 'Missing fields' });
+    return;
+  }
+  const existing = await prisma.user.findUnique({ where: { username } });
+  if (existing) {
+    res.status(409).json({ error: 'Username already exists' });
+    return;
+  }
+  const hashed = await bcrypt.hash(password, 10);
+  const user = await prisma.user.create({ data: { username, password: hashed } });
+  const token = jwt.sign({ userId: user.id, username: user.username }, JWT_SECRET, { expiresIn: '1h' });
+  res.json({ token });
+});
+
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
@@ -33,7 +50,7 @@ app.post('/api/login', async (req, res) => {
 });
 
 app.use('/api', (req, res, next) => {
-  if (req.path === '/login' || req.method === 'GET') return next();
+  if (req.path === '/login' || req.path === '/signup' || req.method === 'GET') return next();
   const authHeader = req.headers.authorization;
   if (!authHeader) {
     res.status(401).json({ error: 'Unauthorized' });

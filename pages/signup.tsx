@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
-export default function Login() {
+export default function Signup() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -15,13 +15,14 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    const res = await fetch('http://localhost:3001/api/login', {
+    const res = await fetch('http://localhost:3001/api/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),
     });
     if (!res.ok) {
-      setError('Invalid credentials');
+      const data = await res.json().catch(() => ({}));
+      setError(data.error || 'Signup failed');
       return;
     }
     const data = await res.json();
@@ -33,7 +34,7 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-amber-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Login</CardTitle>
+          <CardTitle>Sign Up</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -49,10 +50,10 @@ export default function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <Button type="submit" className="w-full">Login</Button>
+            <Button type="submit" className="w-full">Create Account</Button>
           </form>
           <p className="mt-4 text-center text-sm">
-            Don't have an account? <Link to="/signup" className="text-blue-500">Sign Up</Link>
+            Already have an account? <Link to="/login" className="text-blue-500">Login</Link>
           </p>
         </CardContent>
       </Card>
