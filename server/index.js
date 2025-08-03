@@ -1,8 +1,11 @@
 import express from 'express';
 import cors from 'cors';
+import { PrismaClient, Prisma } from '@prisma/client';
+import { execSync } from 'child_process';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+
 
 const prisma = new PrismaClient();
 const app = express();
@@ -63,6 +66,31 @@ app.post('/api/timetables', async (req, res) => {
     create: { name }
   });
   res.json(timetable);
+});
+
+app.put('/api/timetables/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  const { name } = req.body;
+  if (!name) {
+    res.status(400).json({ error: 'Name required' });
+    return;
+  }
+  try {
+    const timetable = await prisma.timetable.update({
+      where: { id },
+      data: { name }
+    });
+    res.json(timetable);
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    ) {
+      res.status(409).json({ error: 'Name must be unique' });
+    } else {
+      res.status(500).json({ error: 'Failed to update timetable' });
+    }
+  }
 });
 
 app.delete('/api/timetables/:id', async (req, res) => {
