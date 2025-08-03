@@ -22,6 +22,7 @@ model TimelineEntry {
   description String
   date        DateTime
   precision   String
+  tags        Json      @default("[]")
   createdAt   DateTime  @default(now())
   timetable   Timetable @relation(fields: [timetableId], references: [id])
   timetableId Int

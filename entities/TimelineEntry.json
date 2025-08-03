@@ -24,6 +24,11 @@
     "timetableId": {
       "type": "number",
       "description": "Identifier of the timetable this entry belongs to"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Tags associated with the entry"
     }
   },
   "required": [
