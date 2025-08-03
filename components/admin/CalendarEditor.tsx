@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import enUS from 'date-fns/locale/en-US';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { TimelineEntry } from '@/entities/TimelineEntry';
+import { useSettings } from '@/src/SettingsContext';
 
 const locales = { 'en-US': enUS };
 const localizer = dateFnsLocalizer({ format, parse, startOfWeek, getDay, locales });
@@ -14,6 +15,21 @@ interface Props {
 
 export default function CalendarEditor({ timetableId }: Props) {
   const [events, setEvents] = useState<any[]>([]);
+  const { timeFormat } = useSettings();
+
+  const formats = useMemo(() => {
+    const fmt = timeFormat === '12h' ? 'hh:mm a' : 'HH:mm';
+    return {
+      timeGutterFormat: (date: Date, culture: string, localizer: any) =>
+        localizer.format(date, fmt, culture),
+      eventTimeRangeFormat: (
+        { start, end }: { start: Date; end: Date },
+        culture: string,
+        localizer: any,
+      ) =>
+        `${localizer.format(start, fmt, culture)} - ${localizer.format(end, fmt, culture)}`,
+    };
+  }, [timeFormat]);
 
   const load = async () => {
     if (!timetableId) return;
@@ -52,6 +68,7 @@ export default function CalendarEditor({ timetableId }: Props) {
         style={{ height: 500 }}
         onSelectSlot={handleSelectSlot}
         onSelectEvent={handleSelectEvent}
+        formats={formats}
       />
     </div>
   );
