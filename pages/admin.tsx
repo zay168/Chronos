@@ -44,23 +44,23 @@ export default function Admin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
       <div className="max-w-4xl mx-auto px-6 py-12">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-3 shadow-lg border border-slate-200/60 mb-6">
-            <Settings className="w-6 h-6 text-slate-700" />
-            <span className="text-slate-600 font-medium">Admin Panel</span>
+          <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-3 shadow-lg border border-slate-200/60 mb-6 dark:bg-slate-800/80 dark:border-slate-700/60">
+            <Settings className="w-6 h-6 text-slate-700 dark:text-slate-300" />
+            <span className="text-slate-600 font-medium dark:text-slate-300">Admin Panel</span>
           </div>
           
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-amber-800 bg-clip-text text-transparent mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-amber-800 bg-clip-text text-transparent mb-4 dark:from-slate-100 dark:via-slate-100 dark:to-amber-400">
             Schedule Control
           </h1>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed dark:text-slate-300">
             Add new items to your daily schedule. Each item will automatically position itself based on date.
           </p>
         </motion.div>
@@ -90,16 +90,16 @@ export default function Admin() {
           </div>
           
           <div className="space-y-6">
-            <Card className="bg-white/90 backdrop-blur-sm border-slate-200/60 shadow-lg">
+            <Card className="bg-white/90 backdrop-blur-sm border-slate-200/60 shadow-lg dark:bg-slate-800/90 dark:border-slate-700/60">
               <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-3 text-lg font-bold text-slate-900">
+                <CardTitle className="flex items-center gap-3 text-lg font-bold text-slate-900 dark:text-slate-100">
                   <Clock className="w-5 h-5 text-amber-500" />
                   Recent Entries
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {recentEntries.length === 0 ? (
-                  <p className="text-slate-500 text-center py-8">No entries yet</p>
+                  <p className="text-slate-500 text-center py-8 dark:text-slate-300">No entries yet</p>
                 ) : (
                   <div className="space-y-3">
                     {recentEntries.map((entry) => (
@@ -107,12 +107,12 @@ export default function Admin() {
                         key={entry.id}
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="p-3 bg-slate-50 rounded-xl border border-slate-100"
+                        className="p-3 bg-slate-50 rounded-xl border border-slate-100 dark:bg-slate-700 dark:border-slate-600"
                       >
-                        <h4 className="font-semibold text-slate-900 text-sm mb-1">
+                        <h4 className="font-semibold text-slate-900 text-sm mb-1 dark:text-slate-100">
                           {entry.title}
                         </h4>
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-slate-500 dark:text-slate-300">
                           {new Date(entry.date).toLocaleDateString()}
                         </p>
                       </motion.div>
@@ -122,12 +122,12 @@ export default function Admin() {
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200/60 shadow-lg">
+            <Card className="bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200/60 shadow-lg dark:from-amber-900 dark:to-amber-800">
               <CardContent className="p-6">
                 <div className="text-center">
                   <Sparkles className="w-8 h-8 text-amber-600 mx-auto mb-3" />
-                  <h3 className="font-bold text-amber-900 mb-2">Intelligent Positioning</h3>
-                  <p className="text-sm text-amber-700 leading-relaxed">
+                  <h3 className="font-bold text-amber-900 mb-2 dark:text-amber-200">Intelligent Positioning</h3>
+                  <p className="text-sm text-amber-700 leading-relaxed dark:text-amber-300">
                     Your schedule automatically sorts and positions entries by date, creating an easy-to-follow plan.
                   </p>
                 </div>
