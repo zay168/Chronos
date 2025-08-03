@@ -22,6 +22,16 @@ export class Timetable {
     return res.json();
   }
 
+  static async update(id: number, name: string): Promise<TimetableType> {
+    const res = await fetch(`${API_URL}/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name })
+    });
+    if (!res.ok) throw new Error('Failed to update timetable');
+    return res.json();
+  }
+
   static async delete(id?: number): Promise<void> {
     const url = id ? `${API_URL}/${id}` : API_URL;
     const res = await fetch(url, { method: 'DELETE' });
