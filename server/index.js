@@ -109,9 +109,18 @@ app.delete('/api/timetables', async (_req, res) => {
 app.get('/api/entries/search', async (req, res) => {
   const query = req.query.q || '';
   const timetableId = Number(req.query.timetableId);
+  const startDate = req.query.startDate ? new Date(String(req.query.startDate)) : undefined;
+  const endDate = req.query.endDate ? new Date(String(req.query.endDate)) : undefined;
+  const tags = typeof req.query.tags === 'string' && req.query.tags.length > 0
+    ? String(req.query.tags).split(',')
+    : [];
   const entries = await prisma.timelineEntry.findMany({
     where: {
       timetableId,
+      ...(tags.length > 0 && { tags: { array_contains: tags } }),
+      ...(startDate || endDate
+        ? { date: { ...(startDate && { gte: startDate }), ...(endDate && { lte: endDate }) } }
+        : {}),
       OR: [
         { title: { contains: String(query) } },
         { description: { contains: String(query) } }
@@ -132,12 +141,19 @@ app.get('/api/entries', async (req, res) => {
 });
 
 app.post('/api/entries', async (req, res) => {
+
+  const { title, description, date, precision, timetableId, tags } = req.body;
+
   const { title, description, date, precision, timetableId, recurrenceRule, reminderAt } = req.body;
+
   if (!title || !date || !precision || !timetableId) {
     res.status(400).json({ error: 'Missing fields' });
     return;
   }
   const entry = await prisma.timelineEntry.create({
+
+    data: { title, description, date: new Date(date), precision, timetableId, tags: tags || [] }
+
     data: {
       title,
       description,
@@ -147,6 +163,7 @@ app.post('/api/entries', async (req, res) => {
       recurrenceRule: recurrenceRule || null,
       reminderAt: reminderAt ? new Date(reminderAt) : null,
     }
+
   });
   res.json(entry);
 });
@@ -167,6 +184,9 @@ app.post('/api/entries/bulk', async (req, res) => {
         date: new Date(e.date),
         precision: e.precision,
         timetableId,
+codex/extend-timelineentry-model-with-tags-and-dates
+        tags: e.tags || [],
+
         recurrenceRule: e.recurrenceRule || null,
         reminderAt: e.reminderAt ? new Date(e.reminderAt) : null,
       }
@@ -224,6 +244,7 @@ app.post('/api/entries/:id/generate', async (req, res) => {
         precision: base.precision,
         timetableId: base.timetableId,
         recurrenceRule: base.recurrenceRule,
+
       }
     });
     created.push(entry);

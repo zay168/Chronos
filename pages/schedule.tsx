@@ -14,6 +14,9 @@ export default function Schedule() {
   const [entries, setEntries] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [tags, setTags] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
   const [scrollTop, setScrollTop] = useState(0);
   const [containerHeight, setContainerHeight] = useState(0);
@@ -47,6 +50,9 @@ export default function Schedule() {
     setIsLoading(false);
   };
 
+
+  const searchEntries = async () => {
+
   const handleUpdate = async (formData) => {
     if (!editingEntry) return;
     setIsSaving(true);
@@ -61,10 +67,18 @@ export default function Schedule() {
   };
 
   const searchEntries = async (query: string) => {
+
     if (!timetableId) return;
     setIsLoading(true);
     try {
-      const data = await TimelineEntry.search(query, timetableId);
+      const tagList = tags.split(',').map(t => t.trim()).filter(Boolean);
+      const data = await TimelineEntry.search({
+        query: search.trim(),
+        timetableId,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+        tags: tagList.length ? tagList : undefined,
+      });
       setEntries(data);
     } catch (error) {
       console.error('Error searching schedule entries:', error);
@@ -73,10 +87,15 @@ export default function Schedule() {
   };
 
   const handleSearch = () => {
-    if (search.trim() === '') {
+    if (
+      search.trim() === '' &&
+      startDate === '' &&
+      endDate === '' &&
+      tags.trim() === ''
+    ) {
       loadEntries();
     } else {
-      searchEntries(search.trim());
+      searchEntries();
     }
   };
 
@@ -155,19 +174,43 @@ export default function Schedule() {
             </div>
           )}
 
-          <div className="max-w-md mx-auto mt-8 flex gap-2">
+          <div className="max-w-md mx-auto mt-8 space-y-2">
+            <div className="flex gap-2">
+              <Input
+                type="date"
+                placeholder={t('schedule.startDatePlaceholder')}
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="border-slate-300 flex-1 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+              />
+              <Input
+                type="date"
+                placeholder={t('schedule.endDatePlaceholder')}
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="border-slate-300 flex-1 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+              />
+            </div>
             <Input
-              placeholder={t('schedule.searchPlaceholder')}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="border-slate-300 flex-1 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+              placeholder={t('schedule.tagsPlaceholder')}
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              className="border-slate-300 w-full dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
             />
-            <Button
-              onClick={handleSearch}
-              className="bg-amber-500 hover:bg-amber-600 text-white border-amber-600"
-            >
-              {t('schedule.searchButton')}
-            </Button>
+            <div className="flex gap-2">
+              <Input
+                placeholder={t('schedule.searchPlaceholder')}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="border-slate-300 flex-1 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+              />
+              <Button
+                onClick={handleSearch}
+                className="bg-amber-500 hover:bg-amber-600 text-white border-amber-600"
+              >
+                {t('schedule.searchButton')}
+              </Button>
+            </div>
           </div>
         </motion.div>
 
