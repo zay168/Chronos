@@ -2,7 +2,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Clock, Settings, History, Cog } from "lucide-react";
+import { Clock, Settings, History, Cog, LogIn, LogOut } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -17,14 +17,19 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useTranslation } from "@/src/i18n";
+import { useAuth } from "@/src/AuthContext";
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
   const { t } = useTranslation();
+  const { token, logout } = useAuth();
   const navigationItems = [
     { title: t('nav.schedule'), url: createPageUrl('Schedule'), icon: History },
     { title: t('nav.admin'), url: createPageUrl('Admin'), icon: Settings },
     { title: t('nav.settings'), url: createPageUrl('Settings'), icon: Cog },
+    token
+      ? { title: 'Logout', icon: LogOut, action: logout }
+      : { title: 'Login', url: '/login', icon: LogIn }
   ];
 
   return (
@@ -62,18 +67,30 @@ export default function Layout({ children, currentPageName }) {
                 <SidebarMenu className="space-y-1">
                   {navigationItems.map((item) => (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton
-                        className={`transition-all duration-300 rounded-xl px-4 py-3 ${
-                          location.pathname === item.url
-                            ? 'bg-gradient-to-r from-slate-900 to-slate-800 text-white shadow-lg dark:from-slate-700 dark:to-slate-600'
-                            : 'hover:bg-slate-50 text-slate-700 hover:text-slate-900 dark:hover:bg-slate-700 dark:text-slate-300 dark:hover:text-white'
-                        }`}
-                      >
-                        <Link to={item.url} className="flex items-center gap-3">
-                          <item.icon className="w-5 h-5" />
-                          <span className="font-medium">{item.title}</span>
-                        </Link>
-                      </SidebarMenuButton>
+                      {item.url ? (
+                        <SidebarMenuButton
+                          className={`transition-all duration-300 rounded-xl px-4 py-3 ${
+                            location.pathname === item.url
+                              ? 'bg-gradient-to-r from-slate-900 to-slate-800 text-white shadow-lg dark:from-slate-700 dark:to-slate-600'
+                              : 'hover:bg-slate-50 text-slate-700 hover:text-slate-900 dark:hover:bg-slate-700 dark:text-slate-300 dark:hover:text-white'
+                          }`}
+                        >
+                          <Link to={item.url} className="flex items-center gap-3">
+                            <item.icon className="w-5 h-5" />
+                            <span className="font-medium">{item.title}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      ) : (
+                        <SidebarMenuButton
+                          onClick={item.action}
+                          className="transition-all duration-300 rounded-xl px-4 py-3 hover:bg-slate-50 text-slate-700 hover:text-slate-900 dark:hover:bg-slate-700 dark:text-slate-300 dark:hover:text-white"
+                        >
+                          <div className="flex items-center gap-3">
+                            <item.icon className="w-5 h-5" />
+                            <span className="font-medium">{item.title}</span>
+                          </div>
+                        </SidebarMenuButton>
+                      )}
                     </SidebarMenuItem>
                   ))}
                 </SidebarMenu>

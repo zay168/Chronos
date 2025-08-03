@@ -1,13 +1,51 @@
 import express from 'express';
 import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
-import { execSync } from 'child_process';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+const JWT_SECRET = process.env.JWT_SECRET || 'secret';
+
+app.post('/api/login', async (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    res.status(400).json({ error: 'Missing fields' });
+    return;
+  }
+  const user = await prisma.user.findUnique({ where: { username } });
+  if (!user) {
+    res.status(401).json({ error: 'Invalid credentials' });
+    return;
+  }
+  const valid = await bcrypt.compare(password, user.password);
+  if (!valid) {
+    res.status(401).json({ error: 'Invalid credentials' });
+    return;
+  }
+  const token = jwt.sign({ userId: user.id, username: user.username }, JWT_SECRET, { expiresIn: '1h' });
+  res.json({ token });
+});
+
+app.use('/api', (req, res, next) => {
+  if (req.path === '/login') return next();
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+  const token = authHeader.split(' ')[1];
+  try {
+    jwt.verify(token, JWT_SECRET);
+    next();
+  } catch (err) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+});
 app.get('/api/timetables', async (_req, res) => {
   const timetables = await prisma.timetable.findMany();
   res.json(timetables);
