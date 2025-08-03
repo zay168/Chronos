@@ -66,13 +66,21 @@ app.get('/api/entries', async (req, res) => {
 });
 
 app.post('/api/entries', async (req, res) => {
-  const { title, description, date, precision, timetableId } = req.body;
+  const { title, description, date, precision, timetableId, recurrenceRule, reminderAt } = req.body;
   if (!title || !date || !precision || !timetableId) {
     res.status(400).json({ error: 'Missing fields' });
     return;
   }
   const entry = await prisma.timelineEntry.create({
-    data: { title, description, date: new Date(date), precision, timetableId }
+    data: {
+      title,
+      description,
+      date: new Date(date),
+      precision,
+      timetableId,
+      recurrenceRule: recurrenceRule || null,
+      reminderAt: reminderAt ? new Date(reminderAt) : null,
+    }
   });
   res.json(entry);
 });
@@ -93,6 +101,63 @@ app.post('/api/entries/bulk', async (req, res) => {
         date: new Date(e.date),
         precision: e.precision,
         timetableId,
+        recurrenceRule: e.recurrenceRule || null,
+        reminderAt: e.reminderAt ? new Date(e.reminderAt) : null,
+      }
+    });
+    created.push(entry);
+  }
+  res.json(created);
+});
+
+app.post('/api/entries/:id/reminder', async (req, res) => {
+  const id = Number(req.params.id);
+  const { reminderAt } = req.body;
+  const entry = await prisma.timelineEntry.update({
+    where: { id },
+    data: { reminderAt: reminderAt ? new Date(reminderAt) : null }
+  });
+  res.json(entry);
+});
+
+function getNextDate(date, rule) {
+  const d = new Date(date);
+  switch (rule) {
+    case 'daily':
+      d.setDate(d.getDate() + 1);
+      break;
+    case 'weekly':
+      d.setDate(d.getDate() + 7);
+      break;
+    case 'monthly':
+      d.setMonth(d.getMonth() + 1);
+      break;
+    default:
+      throw new Error('Unsupported recurrence rule');
+  }
+  return d;
+}
+
+app.post('/api/entries/:id/generate', async (req, res) => {
+  const id = Number(req.params.id);
+  const { count = 1 } = req.body;
+  const base = await prisma.timelineEntry.findUnique({ where: { id } });
+  if (!base || !base.recurrenceRule) {
+    res.status(400).json({ error: 'Entry not found or missing recurrence rule' });
+    return;
+  }
+  const created = [];
+  let date = new Date(base.date);
+  for (let i = 0; i < count; i++) {
+    date = getNextDate(date, base.recurrenceRule);
+    const entry = await prisma.timelineEntry.create({
+      data: {
+        title: base.title,
+        description: base.description,
+        date,
+        precision: base.precision,
+        timetableId: base.timetableId,
+        recurrenceRule: base.recurrenceRule,
       }
     });
     created.push(entry);
@@ -124,3 +189,21 @@ const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`API server listening on port ${PORT}`);
 });
+
+async function checkReminders() {
+  const now = new Date();
+  const due = await prisma.timelineEntry.findMany({
+    where: {
+      reminderAt: { lte: now }
+    }
+  });
+  for (const entry of due) {
+    console.log(`Reminder: ${entry.title} at ${entry.reminderAt}`);
+    await prisma.timelineEntry.update({
+      where: { id: entry.id },
+      data: { reminderAt: null }
+    });
+  }
+}
+
+setInterval(checkReminders, 60000);

@@ -4,6 +4,8 @@ export interface TimelineEntryType {
   description: string;
   date: string;
   precision: 'year' | 'month' | 'day' | 'hour' | 'minute';
+  recurrenceRule?: string | null;
+  reminderAt?: string | null;
   createdAt: string;
   timetableId: number;
 }
@@ -58,5 +60,25 @@ export class TimelineEntry {
   static async delete(id: number): Promise<void> {
     const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
     if (!res.ok) throw new Error('Failed to delete entry');
+  }
+
+  static async scheduleReminder(id: number, reminderAt: string | null): Promise<TimelineEntryType> {
+    const res = await fetch(`${API_URL}/${id}/reminder`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reminderAt })
+    });
+    if (!res.ok) throw new Error('Failed to schedule reminder');
+    return res.json();
+  }
+
+  static async generateRecurring(id: number, count: number): Promise<TimelineEntryType[]> {
+    const res = await fetch(`${API_URL}/${id}/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ count })
+    });
+    if (!res.ok) throw new Error('Failed to generate recurrence');
+    return res.json();
   }
 }

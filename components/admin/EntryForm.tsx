@@ -15,6 +15,8 @@ export default function EntryForm({ onSubmit, isLoading, initialData, onCancel }
     description: "",
     date: "",
     precision: "day",
+    recurrenceRule: "none",
+    reminderAt: "",
   });
   const { t } = useTranslation();
 
@@ -50,7 +52,7 @@ export default function EntryForm({ onSubmit, isLoading, initialData, onCancel }
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { date, precision } = formData;
+    const { date, precision, reminderAt, recurrenceRule } = formData;
     let isoDate = "";
     if (precision === "year") isoDate = new Date(`${date}-01-01`).toISOString();
     else if (precision === "month") isoDate = new Date(`${date}-01`).toISOString();
@@ -61,6 +63,15 @@ export default function EntryForm({ onSubmit, isLoading, initialData, onCancel }
     } else {
       setFormData({ title: "", description: "", date: "", precision: "day" });
     }
+    const isoReminder = reminderAt ? new Date(reminderAt).toISOString() : null;
+    const payload = {
+      ...formData,
+      date: isoDate,
+      reminderAt: isoReminder,
+      recurrenceRule: recurrenceRule === "none" ? null : recurrenceRule,
+    };
+    onSubmit(payload);
+    setFormData({ title: "", description: "", date: "", precision: "day", recurrenceRule: "none", reminderAt: "" });
   };
 
   const handleChange = (field, value) => {
@@ -137,6 +148,32 @@ export default function EntryForm({ onSubmit, isLoading, initialData, onCancel }
                   <SelectItem value="minute">{t('entryForm.precision.minute')}</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold text-slate-700">Recurrence</Label>
+              <Select value={formData.recurrenceRule} onValueChange={(value) => handleChange("recurrenceRule", value)}>
+                <SelectTrigger className="border-slate-200 focus:border-amber-400 focus:ring-amber-400/20">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">None</SelectItem>
+                  <SelectItem value="daily">Daily</SelectItem>
+                  <SelectItem value="weekly">Weekly</SelectItem>
+                  <SelectItem value="monthly">Monthly</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="reminder" className="text-sm font-semibold text-slate-700">Reminder</Label>
+              <Input
+                id="reminder"
+                type="datetime-local"
+                value={formData.reminderAt}
+                onChange={(e) => handleChange("reminderAt", e.target.value)}
+                className="border-slate-200 focus:border-amber-400 focus:ring-amber-400/20"
+              />
             </div>
 
             <div className="space-y-2">

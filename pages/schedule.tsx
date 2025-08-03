@@ -95,6 +95,21 @@ export default function Schedule() {
     }
   }, [entries]);
 
+  useEffect(() => {
+    const timers: NodeJS.Timeout[] = [];
+    for (const entry of entries) {
+      if (entry.reminderAt) {
+        const delay = new Date(entry.reminderAt).getTime() - Date.now();
+        if (delay > 0) {
+          timers.push(setTimeout(() => {
+            alert(`Reminder: ${entry.title}`);
+          }, delay));
+        }
+      }
+    }
+    return () => timers.forEach(t => clearTimeout(t));
+  }, [entries]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 flex items-center justify-center">
